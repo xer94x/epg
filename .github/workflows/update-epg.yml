@@ -42,38 +42,93 @@ jobs:
           ok_count=0
           fail_count=0
 
-          # Extra per gestire EPG multipli dal stesso sito
           declare -A site_counter
+
+          # ── Pool di User-Agent realistici ───────────────────────────────────
+          UA_POOL=(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0"
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15"
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0"
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 14.4; rv:125.0) Gecko/20100101 Firefox/125.0"
+          )
+
+          REFERER_POOL=(
+            "https://www.google.it/"
+            "https://www.google.com/"
+            "https://duckduckgo.com/"
+            "https://www.bing.com/"
+          )
 
           make_filename() {
             local url="$1"
             local domain base_name file_name
-
-            # 1) Estrai dominio completo (es: www.epgitalia.tv, open-epg.com)
             domain=$(printf '%s' "$url" | sed -n 's|^[^/]*\/\/||; s|/[^\?]*||; s|:.*||; p' | head -1)
-
-            # 2) Estrai nome del sito: dopo www. (se presente), prima del .com/.tv/.org/.de/.online
             local site_name
             site_name=$(printf '%s' "$domain" | sed 's|^www\.||; s|\.[a-z0-9-]*$||')
-
-            # 3) Estrai nome file dopo ultimo slash, senza estensione e senza 'xml'
             base_name=$(printf '%s' "$url" | sed -n 's|^[^\?]*\/||; s|\?.*||; p' | head -1)
-            # Rimuovi estensione finale (.gz, .xml.gz, .xml)
             file_name=$(printf '%s' "$base_name" | sed 's|\.xml\.gz$||; s|\.gz$||; s|\.xml$||')
-            # Rimuovi 'xml' se presente come nome
             file_name=$(printf '%s' "$file_name" | sed 's|xml||g; s|_*$||')
-
-            # 4) Se ci sono già EPG da questo sito, aggiungi _ + file_name
             if [ -n "${site_counter[$site_name]}" ] && [ "${site_counter[$site_name]}" -gt 0 ]; then
               printf '%s_%s\n' "$site_name" "$file_name"
             else
               printf '%s\n' "$site_name"
             fi
-
             site_counter[$site_name]=$((${site_counter[$site_name]:-0} + 1))
           }
 
-          USER_AGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+          download_url() {
+            local url="$1"
+            local outfile="$2"
+            local max_retries=3
+            local attempt=0
+            local tmpfile="${outfile}.tmp"
+
+            while [ $attempt -lt $max_retries ]; do
+              attempt=$((attempt + 1))
+
+              # Scegli UA e Referer casuali ad ogni tentativo
+              local ua_index=$(( RANDOM % ${#UA_POOL[@]} ))
+              local ref_index=$(( RANDOM % ${#REFERER_POOL[@]} ))
+              local ua="${UA_POOL[$ua_index]}"
+              local referer="${REFERER_POOL[$ref_index]}"
+
+              echo "  Tentativo $attempt/$max_retries (UA: ${ua:0:40}...)"
+
+              rm -f "$tmpfile"
+
+              curl -L \
+                --max-time 15 \
+                --connect-timeout 8 \
+                -A "$ua" \
+                -H "Referer: $referer" \
+                -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" \
+                -H "Accept-Language: it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7" \
+                -H "Accept-Encoding: gzip, deflate, br" \
+                -H "DNT: 1" \
+                -H "Connection: keep-alive" \
+                "$url" -o "$tmpfile" 2>/dev/null
+
+              if [ -s "$tmpfile" ]; then
+                if file "$tmpfile" | grep -qi 'gzip'; then
+                  mv -f "$tmpfile" "$outfile"
+                else
+                  gzip -c "$tmpfile" > "$outfile"
+                  rm -f "$tmpfile"
+                fi
+                echo "  OK: $outfile ($(wc -c < "$outfile") bytes)"
+                return 0
+              fi
+
+              rm -f "$tmpfile"
+              echo "  Fallito, attendo prima del prossimo tentativo..."
+              [ $attempt -lt $max_retries ] && sleep 5
+            done
+
+            echo "  FALLITO dopo $max_retries tentativi: $url"
+            return 1
+          }
 
           while IFS= read -r url; do
             [ -z "$url" ] && continue
@@ -83,31 +138,12 @@ jobs:
 
             short_name=$(make_filename "$url")
             outfile="epg/${short_name}.gz"
-            tmpfile="${outfile}.tmp"
 
-            rm -f "$tmpfile"
-
-            curl -L \
-              --max-time 180 \
-              -A "$USER_AGENT" \
-              "$url" -o "$tmpfile"
-
-            if [ ! -s "$tmpfile" ]; then
-              echo "Download fallito o vuoto: $url"
-              rm -f "$tmpfile"
-              fail_count=$((fail_count + 1))
-              continue
-            fi
-
-            if file "$tmpfile" | grep -qi 'gzip'; then
-              mv -f "$tmpfile" "$outfile"
+            if download_url "$url" "$outfile"; then
+              ok_count=$((ok_count + 1))
             else
-              gzip -c "$tmpfile" > "$outfile"
-              rm -f "$tmpfile"
+              fail_count=$((fail_count + 1))
             fi
-
-            echo "Salvato: $outfile ($(wc -c < "$outfile") bytes)"
-            ok_count=$((ok_count + 1))
           done <<< "$EPG_URLS"
 
           echo "EPG_OK_COUNT=$ok_count" >> "$GITHUB_ENV"
