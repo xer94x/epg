@@ -164,7 +164,7 @@ def _read_file_bytes(filepath: str) -> bytes | None:
         with gzip.open(filepath, "rb") as f:
             data = f.read()
         # Sanity check: deve sembrare XML
-        stripped = data.lstrip()
+        stripped = data.lstrip(b'\xef\xbb\xbf \t\r\n')
         if stripped.startswith(b"<") or stripped.startswith(b"<?"):
             return data
         # Contenuto non XML dopo decompressione → prova plain
@@ -175,7 +175,7 @@ def _read_file_bytes(filepath: str) -> bytes | None:
     try:
         with open(filepath, "rb") as f:
             data = f.read()
-        stripped = data.lstrip()
+        stripped = data.lstrip(b'\xef\xbb\xbf \t\r\n')
         if stripped.startswith(b"<") or stripped.startswith(b"<?"):
             return data
     except Exception as e:
@@ -200,6 +200,9 @@ def parse_gz_epg(
     data = _read_file_bytes(filepath)
     if data is None:
         return channels, programmes
+
+    # Rimuovi BOM UTF-8 se presente (causa errori nel parser XML)
+    data = data.lstrip(b'\xef\xbb\xbf')
 
     try:
         root = etree.fromstring(data)
@@ -360,3 +363,4 @@ if __name__ == "__main__":
     output   = sys.argv[2] if len(sys.argv) > 2 else "epg/merged_epg.xml.gz"
     ref_path = sys.argv[3] if len(sys.argv) > 3 else "riferimento.txt"
     merge_epg(epg_dir, output, ref_path)
+
