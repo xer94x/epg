@@ -97,9 +97,7 @@ jobs:
 
               rm -f "$tmpfile"
 
-              local http_code
-              http_code=$(curl -L \
-                $ssl_flag \
+              curl -L $ssl_flag \
                 --max-time 15 \
                 --connect-timeout 8 \
                 -A "$ua" \
@@ -109,9 +107,7 @@ jobs:
                 -H "Accept-Encoding: gzip, deflate, br" \
                 -H "DNT: 1" \
                 -H "Connection: keep-alive" \
-                -w "%{http_code}" \
-                "$url" -o "$tmpfile" 2>/dev/null)
-              echo "  HTTP status: $http_code"
+                "$url" -o "$tmpfile" 2>/dev/null
 
               if [ -s "$tmpfile" ]; then
                 if file "$tmpfile" | grep -qi 'gzip'; then
