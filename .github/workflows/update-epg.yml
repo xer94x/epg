@@ -15,6 +15,7 @@ env:
     https://www.epgitalia.tv/gzip
     https://www.epgitalia.tv/guidexz
     https://www.epgitalia.tv/guide2
+    http://epg-guide.com/it.gz
     https://www.free-epg.de/api/epg?country=IT
     https://www.open-epg.com/files/italy1.xml.gz
     https://www.open-epg.com/files/italy2.xml.gz
