@@ -86,27 +86,35 @@ jobs:
 
               rm -f "$tmpfile"
 
+              # NON inviamo Accept-Encoding: così curl riceve sempre i byte raw
+              # (gzip reale o XML plain) senza decompressione trasparente HTTP.
               curl -L \
-                --max-time 15 \
-                --connect-timeout 8 \
+                --max-time 60 \
+                --connect-timeout 10 \
                 -A "$ua" \
                 -H "Referer: $referer" \
-                -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" \
+                -H "Accept: application/xml,text/xml,*/*;q=0.8" \
                 -H "Accept-Language: it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7" \
-                -H "Accept-Encoding: gzip, deflate, br" \
                 -H "DNT: 1" \
                 -H "Connection: keep-alive" \
                 -w "  → http=%{http_code} size=%{size_download} time=%{time_total}s\n" \
                 "$url" -o "$tmpfile" 2>/dev/null
 
               if [ -s "$tmpfile" ]; then
-                if file "$tmpfile" | grep -qi 'gzip'; then
+                # Controlla i magic bytes per decidere il formato reale
+                local magic
+                magic=$(xxd -p -l 2 "$tmpfile" 2>/dev/null || od -A n -N 2 -t x1 "$tmpfile" | tr -d ' ')
+
+                if [ "$magic" = "1f8b" ]; then
+                  # Gzip reale: sposta direttamente
                   mv -f "$tmpfile" "$outfile"
+                  echo "  OK (gzip): $outfile ($(wc -c < "$outfile") bytes)"
                 else
+                  # XML plain (o altro): comprimi in gzip
                   gzip -c "$tmpfile" > "$outfile"
                   rm -f "$tmpfile"
+                  echo "  OK (xml→gz): $outfile ($(wc -c < "$outfile") bytes)"
                 fi
-                echo "  OK: $outfile ($(wc -c < "$outfile") bytes)"
                 return 0
               fi
 
