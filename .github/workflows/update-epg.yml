@@ -12,6 +12,9 @@ env:
   EPG_URLS: |
     https://iptv-epg.org/files/epg-it.xml
     https://epgshare01.online/epgshare01/epg_ripper_IT1.xml.gz
+    https://www.epgitalia.tv/gzip
+    https://www.epgitalia.tv/guidexz
+    https://www.epgitalia.tv/guide2
     https://www.free-epg.de/api/epg?country=IT
     https://www.open-epg.com/files/italy1.xml.gz
     https://www.open-epg.com/files/italy2.xml.gz
@@ -21,9 +24,6 @@ env:
     https://www.open-epg.com/files/italy6.xml.gz
     https://www.open-epg.com/files/italy7.xml.gz
     https://www.open-epg.com/files/italy8.xml.gz
-    https://www.epgitalia.tv/gzip
-    https://www.epgitalia.tv/guidexz
-    https://www.epgitalia.tv/guide2
 
 jobs:
   update:
@@ -52,6 +52,8 @@ jobs:
             esac
           }
 
+          USER_AGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+
           while IFS= read -r url; do
             [ -z "$url" ] && continue
 
@@ -63,11 +65,13 @@ jobs:
 
             rm -f "$tmpfile"
 
-            curl -L --max-time 90 --fail "$url" -o "$tmpfile"
-            curl_status=$?
+            curl -L \
+              --max-time 180 \
+              -A "$USER_AGENT" \
+              "$url" -o "$tmpfile"
 
-            if [ $curl_status -ne 0 ] || [ ! -s "$tmpfile" ]; then
-              echo "Download fallito: $url"
+            if [ ! -s "$tmpfile" ]; then
+              echo "Download fallito o vuoto: $url"
               rm -f "$tmpfile"
               fail_count=$((fail_count + 1))
               continue
@@ -80,7 +84,7 @@ jobs:
               rm -f "$tmpfile"
             fi
 
-            echo "Salvato: $outfile"
+            echo "Salvato: $outfile ($(wc -c < "$outfile") bytes)"
             ok_count=$((ok_count + 1))
           done <<< "$EPG_URLS"
 
