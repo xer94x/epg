@@ -288,8 +288,8 @@ def merge_epg(epg_dir: str, output_path: str, ref_path: str) -> None:
 
         for cid, prog_list in progs.items():
             if prog_list:
-                total_score = sum(score_programme(p) for p in prog_list)
-                source_buckets[cid].append((total_score, prog_list))
+                avg_score = sum(score_programme(p) for p in prog_list) / len(prog_list)
+                source_buckets[cid].append((avg_score, prog_list))
 
     # 4. Per ogni canale scegli la fonte con punteggio più alto
     best_programmes: dict[str, list] = {}
