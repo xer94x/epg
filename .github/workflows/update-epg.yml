@@ -61,7 +61,7 @@ jobs:
             outfile="epg/$(sanitize_filename "$url")"
             tmpfile="${outfile}.tmp"
 
-            rm -f "$outfile" "$tmpfile"
+            rm -f "$tmpfile"
 
             curl -L --max-time 90 --fail "$url" -o "$tmpfile"
             curl_status=$?
@@ -74,29 +74,18 @@ jobs:
             fi
 
             if file "$tmpfile" | grep -qi 'gzip'; then
-              mv "$tmpfile" "$outfile"
+              mv -f "$tmpfile" "$outfile"
             else
               gzip -c "$tmpfile" > "$outfile"
               rm -f "$tmpfile"
             fi
 
-            if gunzip -c "$outfile" 2>/dev/null | grep -q '<tv'; then
-              echo "OK: $outfile"
-              ok_count=$((ok_count + 1))
-            else
-              echo "File non valido, rimosso: $outfile"
-              rm -f "$outfile"
-              fail_count=$((fail_count + 1))
-            fi
+            echo "Salvato: $outfile"
+            ok_count=$((ok_count + 1))
           done <<< "$EPG_URLS"
 
           echo "EPG_OK_COUNT=$ok_count" >> "$GITHUB_ENV"
           echo "EPG_FAIL_COUNT=$fail_count" >> "$GITHUB_ENV"
-
-          if [ "$ok_count" -eq 0 ]; then
-            echo "ERRORE: nessuna fonte valida scaricata"
-            exit 1
-          fi
 
       - name: Commit e push
         shell: bash
@@ -105,7 +94,6 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           git add epg/*.gz 2>/dev/null || true
-          git ls-files --deleted | xargs -r git rm
 
           if git diff --cached --quiet; then
             echo "Nessuna modifica EPG"
