@@ -1,72 +1,115 @@
 name: Aggiorna EPG
+
 on:
   schedule:
-    - cron: '0 8 * * *'   # 8:00 UTC → 9:00 CET (inverno) / 10:00 CEST (estate)
+    - cron: '0 8 * * *'
   workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  EPG_URLS: |
+    https://iptv-epg.org/files/epg-it.xml
+    https://epgshare01.online/epgshare01/epg_ripper_IT1.xml.gz
+    https://www.epgitalia.tv/gzip
+    https://www.epgitalia.tv/guidexz
+    https://www.epgitalia.tv/guide2
+    https://www.free-epg.de/api/epg?country=IT
+    https://www.open-epg.com/files/italy1.xml.gz
+    https://www.open-epg.com/files/italy2.xml.gz
+    https://www.open-epg.com/files/italy3.xml.gz
+    https://www.open-epg.com/files/italy4.xml.gz
+    https://www.open-epg.com/files/italy5.xml.gz
+    https://www.open-epg.com/files/italy6.xml.gz
+    https://www.open-epg.com/files/italy7.xml.gz
+    https://www.open-epg.com/files/italy8.xml.gz
+
 jobs:
   update:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # ── FONTE PRIMARIA: iptv-epg.org → epg-it2.xml.gz ────────────────────
-      - name: Scarica EPG primario (iptv-epg.org)
+      - name: Scarica tutte le fonti EPG
+        shell: bash
         run: |
-          curl -L --max-time 60 \
-            "https://iptv-epg.org/files/epg-it.xml" \
-            -o epg-raw2 || true
-          if [ -f epg-raw2 ]; then
-            if file epg-raw2 | grep -q 'gzip'; then
-              mv epg-raw2 epg-it2.xml.gz
-            else
-              gzip -c epg-raw2 > epg-it2.xml.gz
+          set +e
+          mkdir -p epg
+
+          ok_count=0
+          fail_count=0
+
+          sanitize_filename() {
+            local url="$1"
+            local name
+            name=$(printf '%s' "$url" | sed 's|://|___|g; s|[/?&=:%#]|_|g')
+            case "$name" in
+              *.gz) printf '%s\n' "$name" ;;
+              *)    printf '%s.gz\n' "$name" ;;
+            esac
+          }
+
+          while IFS= read -r url; do
+            [ -z "$url" ] && continue
+
+            echo "----------------------------------------"
+            echo "Fonte: $url"
+
+            outfile="epg/$(sanitize_filename "$url")"
+            tmpfile="${outfile}.tmp"
+
+            rm -f "$outfile" "$tmpfile"
+
+            curl -L --max-time 90 --fail "$url" -o "$tmpfile"
+            curl_status=$?
+
+            if [ $curl_status -ne 0 ] || [ ! -s "$tmpfile" ]; then
+              echo "Download fallito: $url"
+              rm -f "$tmpfile"
+              fail_count=$((fail_count + 1))
+              continue
             fi
-            rm -f epg-raw2
-          fi
-          if gunzip -c epg-it2.xml.gz 2>/dev/null | grep -q '<tv'; then
-            echo "FONTE_PRIMARY_OK=true" >> $GITHUB_ENV
-            echo "Primario OK — $(wc -c < epg-it2.xml.gz) bytes compressi"
-          else
-            echo "FONTE_PRIMARY_OK=false" >> $GITHUB_ENV
-            echo "Fonte primaria fallita"
-            rm -f epg-it2.xml.gz
-          fi
 
-      # ── FONTE SECONDARIA: epgitalia.tv → epg-it.xml.gz ───────────────────
-      - name: Scarica EPG secondario (epgitalia.tv)
-        run: |
-          curl -L --max-time 60 \
-            "https://www.epgitalia.tv/gzip" \
-            -o epg-it.xml.gz || true
-          if gunzip -c epg-it.xml.gz 2>/dev/null | grep -q '<tv'; then
-            echo "FONTE_SECONDARY_OK=true" >> $GITHUB_ENV
-            echo "Secondario OK — $(wc -c < epg-it.xml.gz) bytes compressi"
-          else
-            echo "FONTE_SECONDARY_OK=false" >> $GITHUB_ENV
-            echo "Fonte secondaria fallita"
-            rm -f epg-it.xml.gz
-          fi
+            if file "$tmpfile" | grep -qi 'gzip'; then
+              mv "$tmpfile" "$outfile"
+            else
+              gzip -c "$tmpfile" > "$outfile"
+              rm -f "$tmpfile"
+            fi
 
-      # ── VERIFICA: almeno la fonte primaria deve funzionare ───────────────
-      - name: Verifica disponibilità fonti
-        run: |
-          if [ "$FONTE_PRIMARY_OK" != "true" ]; then
-            echo "ERRORE: fonte primaria (iptv-epg.org) non disponibile"
+            if gunzip -c "$outfile" 2>/dev/null | grep -q '<tv'; then
+              echo "OK: $outfile"
+              ok_count=$((ok_count + 1))
+            else
+              echo "File non valido, rimosso: $outfile"
+              rm -f "$outfile"
+              fail_count=$((fail_count + 1))
+            fi
+          done <<< "$EPG_URLS"
+
+          echo "EPG_OK_COUNT=$ok_count" >> "$GITHUB_ENV"
+          echo "EPG_FAIL_COUNT=$fail_count" >> "$GITHUB_ENV"
+
+          if [ "$ok_count" -eq 0 ]; then
+            echo "ERRORE: nessuna fonte valida scaricata"
             exit 1
           fi
-          echo "Fonti — PRIMARY=$FONTE_PRIMARY_OK SECONDARY=$FONTE_SECONDARY_OK"
 
-      # ── COMMIT ────────────────────────────────────────────────────────────
       - name: Commit e push
+        shell: bash
         run: |
-          git config user.name  "github-actions[bot]"
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add epg-it.xml.gz epg-it2.xml.gz 2>/dev/null || true
+
+          git add epg/*.gz 2>/dev/null || true
           git ls-files --deleted | xargs -r git rm
+
           if git diff --cached --quiet; then
             echo "Nessuna modifica EPG"
           else
-            git commit -m "EPG aggiornato $(date -u '+%Y-%m-%d %H:%M UTC') [P=$FONTE_PRIMARY_OK S=$FONTE_SECONDARY_OK]"
+            git commit -m "EPG aggiornato $(date -u '+%Y-%m-%d %H:%M UTC') [OK=$EPG_OK_COUNT FAIL=$EPG_FAIL_COUNT]"
             git push
           fi
