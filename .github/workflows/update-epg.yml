@@ -44,37 +44,24 @@ jobs:
 
           declare -A site_counter
 
-          # ── Pool di User-Agent realistici ───────────────────────────────────
-          UA_POOL=(
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0"
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15"
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0"
-            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 14.4; rv:125.0) Gecko/20100101 Firefox/125.0"
-          )
-
-          REFERER_POOL=(
-            "https://www.google.it/"
-            "https://www.google.com/"
-            "https://duckduckgo.com/"
-            "https://www.bing.com/"
-          )
-
           make_filename() {
             local url="$1"
             local domain base_name file_name
+
             domain=$(printf '%s' "$url" | sed -n 's|^[^/]*\/\/||; s|/[^\?]*||; s|:.*||; p' | head -1)
             local site_name
             site_name=$(printf '%s' "$domain" | sed 's|^www\.||; s|\.[a-z0-9-]*$||')
+
             base_name=$(printf '%s' "$url" | sed -n 's|^[^\?]*\/||; s|\?.*||; p' | head -1)
             file_name=$(printf '%s' "$base_name" | sed 's|\.xml\.gz$||; s|\.gz$||; s|\.xml$||')
             file_name=$(printf '%s' "$file_name" | sed 's|xml||g; s|_*$||')
+
             if [ -n "${site_counter[$site_name]}" ] && [ "${site_counter[$site_name]}" -gt 0 ]; then
               printf '%s_%s\n' "$site_name" "$file_name"
             else
               printf '%s\n' "$site_name"
             fi
+
             site_counter[$site_name]=$((${site_counter[$site_name]:-0} + 1))
           }
 
@@ -85,16 +72,23 @@ jobs:
             local attempt=0
             local tmpfile="${outfile}.tmp"
 
+            # UA diverso garantito per ogni tentativo
+            local UA0="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+            local UA1="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0"
+            local UA2="Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15"
+
+            local REF0="https://www.google.it/"
+            local REF1="https://duckduckgo.com/"
+            local REF2="https://www.bing.com/"
+
             while [ $attempt -lt $max_retries ]; do
+              local ua_var="UA${attempt}"
+              local ref_var="REF${attempt}"
+              local ua="${!ua_var}"
+              local referer="${!ref_var}"
+
               attempt=$((attempt + 1))
-
-              # Scegli UA e Referer casuali ad ogni tentativo
-              local ua_index=$(( RANDOM % ${#UA_POOL[@]} ))
-              local ref_index=$(( RANDOM % ${#REFERER_POOL[@]} ))
-              local ua="${UA_POOL[$ua_index]}"
-              local referer="${REFERER_POOL[$ref_index]}"
-
-              echo "  Tentativo $attempt/$max_retries (UA: ${ua:0:40}...)"
+              echo "  Tentativo $attempt/$max_retries — UA: ${ua:0:60}..."
 
               rm -f "$tmpfile"
 
