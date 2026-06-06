@@ -42,14 +42,35 @@ jobs:
           ok_count=0
           fail_count=0
 
-          sanitize_filename() {
+          # Extra per gestire EPG multipli dal stesso sito
+          declare -A site_counter
+
+          make_filename() {
             local url="$1"
-            local name
-            name=$(printf '%s' "$url" | sed 's|://|___|g; s|[/?&=:%#]|_|g')
-            case "$name" in
-              *.gz) printf '%s\n' "$name" ;;
-              *)    printf '%s.gz\n' "$name" ;;
-            esac
+            local domain base_name file_name
+
+            # 1) Estrai dominio completo (es: www.epgitalia.tv, open-epg.com)
+            domain=$(printf '%s' "$url" | sed -n 's|^[^/]*\/\/||; s|/[^\?]*||; s|:.*||; p' | head -1)
+
+            # 2) Estrai nome del sito: dopo www. (se presente), prima del .com/.tv/.org/.de/.online
+            local site_name
+            site_name=$(printf '%s' "$domain" | sed 's|^www\.||; s|\.[a-z0-9-]*$||')
+
+            # 3) Estrai nome file dopo ultimo slash, senza estensione e senza 'xml'
+            base_name=$(printf '%s' "$url" | sed -n 's|^[^\?]*\/||; s|\?.*||; p' | head -1)
+            # Rimuovi estensione finale (.gz, .xml.gz, .xml)
+            file_name=$(printf '%s' "$base_name" | sed 's|\.xml\.gz$||; s|\.gz$||; s|\.xml$||')
+            # Rimuovi 'xml' se presente come nome
+            file_name=$(printf '%s' "$file_name" | sed 's|xml||g; s|_*$||')
+
+            # 4) Se ci sono già EPG da questo sito, aggiungi _ + file_name
+            if [ -n "${site_counter[$site_name]}" ] && [ "${site_counter[$site_name]}" -gt 0 ]; then
+              printf '%s_%s\n' "$site_name" "$file_name"
+            else
+              printf '%s\n' "$site_name"
+            fi
+
+            site_counter[$site_name]=$((${site_counter[$site_name]:-0} + 1))
           }
 
           USER_AGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -60,7 +81,8 @@ jobs:
             echo "----------------------------------------"
             echo "Fonte: $url"
 
-            outfile="epg/$(sanitize_filename "$url")"
+            short_name=$(make_filename "$url")
+            outfile="epg/${short_name}.gz"
             tmpfile="${outfile}.tmp"
 
             rm -f "$tmpfile"
