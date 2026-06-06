@@ -12,9 +12,6 @@ env:
   EPG_URLS: |
     https://iptv-epg.org/files/epg-it.xml
     https://epgshare01.online/epgshare01/epg_ripper_IT1.xml.gz
-    https://www.epgitalia.tv/gzip
-    https://www.epgitalia.tv/guidexz
-    https://www.epgitalia.tv/guide2
     http://epg-guide.com/it.gz
     https://www.free-epg.de/api/epg?country=IT
     https://www.open-epg.com/files/italy1.xml.gz
