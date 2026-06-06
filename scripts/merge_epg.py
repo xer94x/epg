@@ -8,10 +8,9 @@ scegliendo per ogni canale la fonte con più informazioni.
 IMPORTANTE: vengono inclusi SOLO i canali presenti in riferimento.txt.
 
 Gestione fusi orari:
-  - Se una sorgente ha mix +0000 e +0200, vengono tenuti SOLO i +0200
+  - Se una sorgente ha mix +0000 e +0200, vengono tenuti SOLO i +0000
     (filtro applicato PRIMA del calcolo del punteggio).
-  - Se la sorgente vincente ha solo +0000, tutti i timestamp vengono
-    convertiti in +0200 (aggiunge 2 ore).
+  - L'output mantiene gli offset originali senza conversioni.
 
 Uso: python merge_epg.py [epg_dir] [output_gz] [riferimento.txt]
      default: epg/  epg/merged_epg.xml.gz  riferimento.txt
@@ -102,43 +101,7 @@ def _get_offset_str(ts: str) -> str | None:
     m = _TS_RE.match(ts.strip())
     if not m:
         return None
-    return m.group(7)  # es. '+0200' oppure None
-
-
-def _add_hours_to_ts(ts: str, hours: int) -> str:
-    """
-    Aggiunge `hours` ore a un timestamp EPG e imposta l'offset a +0200.
-    Gestisce il carry sui minuti/ore/giorni (non si occupa di cambio mese/anno,
-    sufficiente per lo scopo).
-    Formato input/output: YYYYMMDDHHmmss +HHMM
-    """
-    ts = ts.strip()
-    m = _TS_RE.match(ts)
-    if not m:
-        return ts
-
-    yy, mo, dd = int(m.group(1)), int(m.group(2)), int(m.group(3))
-    hh, mn, ss = int(m.group(4)), int(m.group(5)), int(m.group(6))
-
-    hh += hours
-    # Gestione carry giorno (semplificato)
-    day_carry = hh // 24
-    hh = hh % 24
-    dd += day_carry
-
-    # Correzione fine mese (approssimata, sufficiente per EPG a 7-14 giorni)
-    days_in_month = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-    # Anno bisestile
-    if (yy % 4 == 0 and yy % 100 != 0) or (yy % 400 == 0):
-        days_in_month[2] = 29
-    if dd > days_in_month[mo]:
-        dd = 1
-        mo += 1
-        if mo > 12:
-            mo = 1
-            yy += 1
-
-    return f"{yy:04d}{mo:02d}{dd:02d}{hh:02d}{mn:02d}{ss:02d} +0200"
+    return m.group(7)
 
 
 # ---------------------------------------------------------------------------
@@ -148,19 +111,19 @@ def _add_hours_to_ts(ts: str, hours: int) -> str:
 def filter_timezone(prog_list: list) -> tuple[list, str]:
     """
     Analizza i timestamp della lista e:
-      - Se ci sono sia +0200 che +0000 → tieni solo i +0200  (mix → filtra)
+      - Se ci sono sia +0200 che +0000 → tieni solo i +0000  (mix → filtra)
       - Se ci sono solo +0200 → lista invariata
-      - Se ci sono solo +0000 → lista invariata (conversione avverrà dopo)
+      - Se ci sono solo +0000 → lista invariata
       - Se non c'è offset → lista invariata
 
     Restituisce (lista_filtrata, tipo):
-      tipo = 'only_local'  (+0200 o locale non zero)
+      tipo = 'only_local'  (solo +0200 o offset non-zero)
              'only_utc'    (solo +0000)
-             'mixed'       (aveva mix, ora solo +0200)
+             'mixed'       (aveva mix, ora solo +0000)
              'no_offset'   (nessun offset presente)
     """
-    has_local = False   # +0200 o qualsiasi offset non-zero
-    has_utc   = False   # +0000
+    has_local = False
+    has_utc   = False
 
     for prog in prog_list:
         for attr in ("start", "stop"):
@@ -173,16 +136,9 @@ def filter_timezone(prog_list: list) -> tuple[list, str]:
                 has_local = True
 
     if has_local and has_utc:
-        # Mix → tieni solo quelli con offset locale (non +0000)
         filtered = [
             p for p in prog_list
-            if _get_offset_str(p.get("start", "")) not in ("+0000", None)
-            or _get_offset_str(p.get("start", "")) is None  # sicurezza: no offset → tieni
-        ]
-        # Più preciso: tieni solo se start NON è +0000
-        filtered = [
-            p for p in prog_list
-            if _get_offset_str(p.get("start", "")) != "+0000"
+            if _get_offset_str(p.get("start", "")) == "+0000"
         ]
         return filtered, "mixed"
     elif has_local and not has_utc:
@@ -191,24 +147,6 @@ def filter_timezone(prog_list: list) -> tuple[list, str]:
         return prog_list, "only_utc"
     else:
         return prog_list, "no_offset"
-
-
-def convert_utc_to_local(prog_list: list) -> list:
-    """
-    Converte tutti i timestamp +0000 in +0200 aggiungendo 2 ore.
-    Modifica gli attributi start e stop di ogni elemento in-place
-    (su una copia dell'elemento per non alterare l'originale).
-    """
-    result = []
-    for prog in prog_list:
-        start = prog.get("start", "")
-        stop  = prog.get("stop",  "")
-        if _get_offset_str(start) == "+0000":
-            prog.set("start", _add_hours_to_ts(start, 2))
-        if _get_offset_str(stop) == "+0000":
-            prog.set("stop",  _add_hours_to_ts(stop,  2))
-        result.append(prog)
-    return result
 
 
 # ---------------------------------------------------------------------------
@@ -340,8 +278,8 @@ def merge_epg(epg_dir: str, output_path: str, ref_path: str) -> None:
 
     # 3. Parsa tutte le sorgenti
     all_channels: dict = {}
-    # per_channel_sources[cid] = lista di (avg_score, prog_list_filtrata, tz_type)
-    per_channel_sources: dict[str, list[tuple[float, list, str]]] = defaultdict(list)
+    # per_channel_sources[cid] = lista di (avg_score, prog_list_filtrata, tz_type, fname)
+    per_channel_sources: dict[str, list[tuple[float, list, str, str]]] = defaultdict(list)
 
     for gz_path in gz_files:
         fname = os.path.basename(gz_path)
@@ -355,35 +293,43 @@ def merge_epg(epg_dir: str, output_path: str, ref_path: str) -> None:
             if cid not in all_channels:
                 all_channels[cid] = ch_elem
 
+        # Conta canali con +0200 rimossi per questa sorgente
+        mixed_removed_count = 0
+
         for cid, prog_list in progs.items():
             if not prog_list:
                 continue
 
-            # ── PASSO CHIAVE: filtra fuso orario PRIMA dello score ──
             filtered_list, tz_type = filter_timezone(prog_list)
 
             if not filtered_list:
                 continue
 
             if tz_type == "mixed":
-                print(f"    [{fname}] {cid}: mix +0000/+0200 → tenuti solo +0200 ({len(filtered_list)}/{len(prog_list)})")
+                mixed_removed_count += 1
 
             avg_score = sum(score_programme(p) for p in filtered_list) / len(filtered_list)
-            per_channel_sources[cid].append((avg_score, filtered_list, tz_type))
+            per_channel_sources[cid].append((avg_score, filtered_list, tz_type, fname))
+
+        if mixed_removed_count > 0:
+            print(f"    ↳ [{fname}] canali con +0200 rimossi (mix): {mixed_removed_count}")
 
     # 4. Per ogni canale scegli la fonte con punteggio medio più alto
     print("\nSelezione sorgente migliore per canale...")
+
     best_programmes: dict[str, list] = {}
+    # Conta quante volte ogni sorgente vince
+    wins_per_source: dict[str, int] = defaultdict(int)
 
     for cid, sources in per_channel_sources.items():
-        best_score, best_list, best_tz = max(sources, key=lambda x: x[0])
-
-        # Se la sorgente vincente ha solo +0000 → converti in +0200
-        if best_tz == "only_utc":
-            best_list = convert_utc_to_local(best_list)
-            print(f"  {cid}: sorgente +0000 → convertita in +0200")
-
+        best_score, best_list, best_tz, best_fname = max(sources, key=lambda x: x[0])
         best_programmes[cid] = best_list
+        wins_per_source[best_fname] += 1
+
+    # Stampa riepilogo vincitori
+    print("\n── Sorgenti vincitrici ──")
+    for fname, count in sorted(wins_per_source.items(), key=lambda x: -x[1]):
+        print(f"  {fname}: {count} canali vinti")
 
     # 5. Aggiungi <channel> sintetici per canali senza elemento <channel>
     for cid in canonical_ids:
@@ -444,3 +390,4 @@ if __name__ == "__main__":
     output   = sys.argv[2] if len(sys.argv) > 2 else "epg/merged_epg.xml.gz"
     ref_path = sys.argv[3] if len(sys.argv) > 3 else "riferimento.txt"
     merge_epg(epg_dir, output, ref_path)
+
