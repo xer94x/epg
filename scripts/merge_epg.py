@@ -8,6 +8,10 @@ scegliendo per ogni canale la fonte con più informazioni.
 IMPORTANTE: vengono inclusi SOLO i canali presenti in riferimento.txt.
 Qualsiasi canale non mappato viene scartato sia come <channel> che come <programme>.
 
+De-duplicazione cross-source: quando una sorgente replica lo stesso programma
+per più fusi orari (senza offset), il confronto tra tutte le sorgenti determina
+per votazione quale orario è quello corretto.
+
 Uso: python merge_epg.py [epg_dir] [output_gz] [riferimento.txt]
      default: epg/  epg/merged_epg.xml.gz  riferimento.txt
 """
@@ -26,17 +30,6 @@ from lxml import etree
 # ---------------------------------------------------------------------------
 
 def load_alias_map(ref_path: str) -> tuple[dict[str, str], set[str]]:
-    """
-    Legge riferimento.txt e restituisce:
-      - alias_map:      alias_normalizzato → channel_id_canonico
-      - canonical_ids:  set dei soli id canonici (whitelist)
-
-    Formato atteso:
-        NomeCanaleUfficiale:       ← termina con ':'  → canonical id
-            Alias 1                ← righe successive → alias
-            Alias 2
-                                   ← riga vuota separa i blocchi
-    """
     alias_map: dict[str, str] = {}
     canonical_ids: set[str] = set()
 
@@ -54,14 +47,11 @@ def load_alias_map(ref_path: str) -> tuple[dict[str, str], set[str]]:
         line = raw_line.strip()
         if not line:
             continue
-
         if line.endswith(":") and "(" not in line:
             current_id = line[:-1].strip()
             canonical_ids.add(current_id)
-            # Il canonical id è alias di se stesso
             alias_map[_norm(current_id)] = current_id
             continue
-
         if current_id is not None and "(no additional aliases)" not in line:
             alias_map[_norm(line)] = current_id
 
@@ -69,11 +59,9 @@ def load_alias_map(ref_path: str) -> tuple[dict[str, str], set[str]]:
 
 
 def _norm(s: str) -> str:
-    """Normalizza una stringa per il confronto: strip + lower."""
     return s.strip().lower()
 
 
-# Suffissi da rimuovere nel fallback matching
 _STRIP_SUFFIXES = (
     " hd", " fhd", " sd", " full hd", " 4k",
     ".hd", ".sd", ".fhd",
@@ -82,30 +70,14 @@ _STRIP_SUFFIXES = (
 
 
 def resolve_channel_id(raw_id: str, alias_map: dict[str, str]) -> str | None:
-    """
-    Risolve raw_id al canonical id tramite la mappa.
-    Restituisce None se non trovato (canale da scartare).
-
-    Strategie (in ordine):
-      1. Match diretto
-      2. Rimozione .it finale
-      3. Rimozione suffissi HD/FHD/SD/4K
-      4. Combinazione: suffix + .it
-      5. Nessuna corrispondenza → None
-    """
     key = _norm(raw_id)
-
     if key in alias_map:
         return alias_map[key]
-
-    # Prova senza trailing .it
     key2 = key
     if key2.endswith(".it"):
         key2 = key2[:-3].rstrip(".")
         if key2 in alias_map:
             return alias_map[key2]
-
-    # Prova rimuovendo suffissi comuni
     for suffix in _STRIP_SUFFIXES:
         if key.endswith(suffix):
             k3 = key[: -len(suffix)].strip(" .")
@@ -115,8 +87,81 @@ def resolve_channel_id(raw_id: str, alias_map: dict[str, str]) -> str | None:
                 k3b = k3[:-3].rstrip(".")
                 if k3b in alias_map:
                     return alias_map[k3b]
+    return None
 
-    return None  # non in whitelist → da scartare
+
+# ---------------------------------------------------------------------------
+# Gestione timestamp EPG
+# ---------------------------------------------------------------------------
+
+def parse_epg_ts(ts: str) -> tuple[str, int]:
+    """
+    Dato un timestamp EPG restituisce:
+      - day_key:    stringa "YYYYMMDD" (giorno del programma in UTC se c'è offset,
+                    altrimenti as-is)
+      - start_min:  minuti dalla mezzanotte (normalizzati in UTC se c'è offset,
+                    altrimenti as-is)
+    Usato per raggruppare i programmi per giorno+titolo e trovare duplicati.
+    """
+    ts = ts.strip()
+    m = re.match(r'^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})\d{2}\s*([+-]\d{4})?', ts)
+    if not m:
+        return ("00000000", 0)
+
+    yy, mo, dd, hh, mn = m.group(1), m.group(2), m.group(3), int(m.group(4)), int(m.group(5))
+    off_str = m.group(6)
+
+    total_min = hh * 60 + mn
+
+    if off_str:
+        sign = 1 if off_str[0] == "+" else -1
+        oh = int(off_str[1:3])
+        om = int(off_str[3:5])
+        total_min -= sign * (oh * 60 + om)   # porta in UTC
+
+        # Aggiusta il giorno se lo scorrimento UTC attraversa la mezzanotte
+        # (semplificato: non gestiamo cambio mese/anno, sufficiente per dedup)
+        day_offset = 0
+        if total_min < 0:
+            total_min += 1440
+            day_offset = -1
+        elif total_min >= 1440:
+            total_min -= 1440
+            day_offset = 1
+
+        if day_offset != 0:
+            # Ricalcola la data (grezzo, senza librerie)
+            days_in_month = [0,31,28,31,30,31,30,31,31,30,31,30,31]
+            d = int(dd) + day_offset
+            mo_int = int(mo)
+            yy_int = int(yy)
+            if d < 1:
+                mo_int -= 1
+                if mo_int < 1:
+                    mo_int = 12; yy_int -= 1
+                d = days_in_month[mo_int]
+            elif d > days_in_month[mo_int]:
+                d = 1; mo_int += 1
+                if mo_int > 12:
+                    mo_int = 1; yy_int += 1
+            day_key = f"{yy_int:04d}{mo_int:02d}{d:02d}"
+        else:
+            day_key = f"{yy}{mo}{dd}"
+    else:
+        # Nessun offset: usiamo il valore as-is (non sappiamo il fuso)
+        day_key = f"{yy}{mo}{dd}"
+
+    return (day_key, total_min)
+
+
+def ts_has_offset(ts: str) -> bool:
+    """True se il timestamp contiene un offset esplicito (+HHMM o -HHMM)."""
+    return bool(re.search(r'[+-]\d{4}', ts.strip()))
+
+
+def title_of(prog) -> str:
+    t = prog.find("title")
+    return (t.text or "").strip().lower() if t is not None else ""
 
 
 # ---------------------------------------------------------------------------
@@ -124,13 +169,9 @@ def resolve_channel_id(raw_id: str, alias_map: dict[str, str]) -> str | None:
 # ---------------------------------------------------------------------------
 
 def score_programme(prog_elem) -> int:
-    """
-    Assegna un punteggio a un elemento <programme> in base alla ricchezza.
-    Più info → punteggio più alto → quella fonte viene preferita.
-    """
     score = 1
     for child in prog_elem:
-        tag = child.tag
+        tag  = child.tag
         text = (child.text or "").strip()
         if text:
             score += 1
@@ -150,28 +191,18 @@ def score_programme(prog_elem) -> int:
 
 
 # ---------------------------------------------------------------------------
-# Parsing di un singolo file EPG — supporta .gz e XML plain
+# Parsing di un singolo file EPG
 # ---------------------------------------------------------------------------
 
 def _read_file_bytes(filepath: str) -> bytes | None:
-    """
-    Legge un file tentando prima come gzip, poi come testo plain.
-    Molte sorgenti vengono salvate come .gz ma contengono XML non compresso
-    (es. quando curl segue un redirect HTTP che già decomprime il gzip).
-    """
-    # Tentativo 1: gzip
     try:
         with gzip.open(filepath, "rb") as f:
             data = f.read()
-        # Sanity check: deve sembrare XML
         stripped = data.lstrip(b'\xef\xbb\xbf \t\r\n')
         if stripped.startswith(b"<") or stripped.startswith(b"<?"):
             return data
-        # Contenuto non XML dopo decompressione → prova plain
     except Exception:
         pass
-
-    # Tentativo 2: file plain (già XML non compresso)
     try:
         with open(filepath, "rb") as f:
             data = f.read()
@@ -180,36 +211,24 @@ def _read_file_bytes(filepath: str) -> bytes | None:
             return data
     except Exception as e:
         print(f"  [WARN] Impossibile leggere {filepath}: {e}", file=sys.stderr)
-
     return None
 
 
-def parse_gz_epg(
-    filepath: str,
-    alias_map: dict[str, str],
-) -> tuple[dict, dict]:
-    """
-    Parsa un file EPG e restituisce:
-      channels:   canonical_id → <channel> element
-      programmes: canonical_id → list of <programme> elements
-    Solo i canali presenti nella alias_map (whitelist) vengono inclusi.
-    """
-    channels: dict[str, object] = {}
-    programmes: dict[str, list] = defaultdict(list)
+def parse_gz_epg(filepath: str, alias_map: dict) -> tuple[dict, dict]:
+    channels: dict   = {}
+    programmes: dict = defaultdict(list)
 
     data = _read_file_bytes(filepath)
     if data is None:
         return channels, programmes
 
-    # Rimuovi BOM UTF-8 se presente (causa errori nel parser XML)
     data = data.lstrip(b'\xef\xbb\xbf')
 
     try:
         root = etree.fromstring(data)
     except etree.XMLSyntaxError:
         try:
-            parser = etree.XMLParser(recover=True)
-            root = etree.fromstring(data, parser)
+            root = etree.fromstring(data, etree.XMLParser(recover=True))
         except Exception as e:
             print(f"  [WARN] XML non valido in {filepath}: {e}", file=sys.stderr)
             return channels, programmes
@@ -240,10 +259,137 @@ def parse_gz_epg(
         programmes[cid].append(prog)
 
     if skipped_ch or skipped_prog:
-        fname = os.path.basename(filepath)
         print(f"    ↳ scartati {skipped_ch} canali e {skipped_prog} programmi non in whitelist")
 
     return channels, programmes
+
+
+# ---------------------------------------------------------------------------
+# Cross-source voting deduplication
+# ---------------------------------------------------------------------------
+
+# Tolleranza in minuti: due start time sono "lo stesso slot" se distano ≤ SLOT_TOL
+SLOT_TOL = 5
+
+
+def _group_key(prog) -> tuple[str, str]:
+    """
+    Chiave di raggruppamento: (giorno_UTC_o_locale, titolo_normalizzato).
+    Due programmi con la stessa chiave sono candidati duplicati.
+    """
+    day, _ = parse_epg_ts(prog.get("start", ""))
+    return (day, title_of(prog))
+
+
+def cross_source_deduplicate(
+    source_prog_lists: list[list],   # una lista per sorgente, già filtrate per canale
+) -> tuple[list, int]:
+    """
+    De-duplicazione cross-source per un singolo canale.
+
+    Algoritmo:
+    1. Raccoglie tutti i programmi da tutte le sorgenti con il loro start_min UTC/locale.
+    2. Raggruppa per (giorno, titolo).
+    3. Per ogni gruppo con più di un orario distinto (= duplicati fuso orario):
+       - Conta quante sorgenti usano ciascun orario (voting).
+       - L'orario con più voti è quello "reale".
+       - In caso di parità vince la sorgente con score medio più alto.
+    4. Nella lista finale vengono mantenuti solo i programmi con l'orario vincente,
+       scegliendo tra essi quello con score_programme più alto (più ricco).
+
+    Restituisce (lista_finale, n_duplicati_rimossi).
+    """
+
+    # Struttura: per ogni (day, title) → lista di (start_min, prog, source_idx, has_offset)
+    groups: dict[tuple, list] = defaultdict(list)
+
+    for src_idx, prog_list in enumerate(source_prog_lists):
+        for prog in prog_list:
+            ts  = prog.get("start", "")
+            day, smin = parse_epg_ts(ts)
+            has_off   = ts_has_offset(ts)
+            key = _group_key(prog)
+            groups[key].append((smin, prog, src_idx, has_off))
+
+    final_progs: list = []
+    total_removed = 0
+
+    for (day, title), entries in groups.items():
+        if len(entries) == 1:
+            final_progs.append(entries[0][1])
+            continue
+
+        # ── Raggruppa per "slot orario" (start_min a ±SLOT_TOL minuti) ──
+        # Ogni slot è una lista di entry che condividono lo stesso orario.
+        slots: list[list] = []
+        used = [False] * len(entries)
+
+        for i, (smin_i, prog_i, src_i, off_i) in enumerate(entries):
+            if used[i]:
+                continue
+            slot = [entries[i]]
+            used[i] = True
+            for j in range(i + 1, len(entries)):
+                if used[j]:
+                    continue
+                smin_j = entries[j][0]
+                if abs(smin_i - smin_j) <= SLOT_TOL:
+                    slot.append(entries[j])
+                    used[j] = True
+            slots.append(slot)
+
+        if len(slots) == 1:
+            # Tutti nello stesso slot: nessun duplicato fuso orario,
+            # tieni quello con score più alto
+            best = max(slots[0], key=lambda e: score_programme(e[1]))
+            final_progs.append(best[1])
+            total_removed += len(slots[0]) - 1
+            continue
+
+        # ── Voting: quale slot è quello "reale"? ──
+        #
+        # Regola 1 (priorità massima): se ALMENO UNO slot ha tutti i suoi
+        #   programmi con offset esplicito, quegli orari sono già UTC → sono
+        #   affidabili. Tra gli slot con offset, scegliamo quello con più voti.
+        #
+        # Regola 2: se nessuno slot ha offset, contiamo quante sorgenti DISTINTE
+        #   usano ciascun orario. L'orario più "votato" dalle sorgenti è il reale.
+        #
+        # Regola 3 (spareggio): a parità di voti, vince lo slot con score medio
+        #   più alto (programma più ricco di informazioni).
+
+        def slot_votes(slot):
+            """Numero di sorgenti distinte che usano questo slot."""
+            return len(set(e[2] for e in slot))
+
+        def slot_has_offset(slot):
+            return any(e[3] for e in slot)
+
+        def slot_avg_score(slot):
+            return sum(score_programme(e[1]) for e in slot) / len(slot)
+
+        slots_with_offset = [s for s in slots if slot_has_offset(s)]
+
+        if slots_with_offset:
+            # Regola 1: preferiamo gli slot con offset esplicito
+            candidate_slots = slots_with_offset
+        else:
+            # Regola 2: voting puro tra tutti gli slot
+            candidate_slots = slots
+
+        winning_slot = max(
+            candidate_slots,
+            key=lambda s: (slot_votes(s), slot_avg_score(s))
+        )
+
+        # Dal winning slot, tieni il programma con score più alto
+        best = max(winning_slot, key=lambda e: score_programme(e[1]))
+        final_progs.append(best[1])
+
+        # Tutto il resto (altri slot + duplicati nello stesso slot) è rimosso
+        total_removed += len(entries) - 1
+
+    return final_progs, total_removed
 
 
 # ---------------------------------------------------------------------------
@@ -274,14 +420,16 @@ def merge_epg(epg_dir: str, output_path: str, ref_path: str) -> None:
     print(f"\nTrovati {len(gz_files)} file EPG sorgente.")
 
     # 3. Parsa tutte le sorgenti
-    all_channels: dict[str, object] = {}
-    source_buckets: dict[str, list[tuple[int, list]]] = defaultdict(list)
+    #    Teniamo TUTTE le liste per canale (una per sorgente) per il cross-voting.
+    all_channels: dict = {}
+    # per_channel_sources[cid] = lista di (avg_score, prog_list, source_idx)
+    per_channel_sources: dict[str, list[tuple[float, list, int]]] = defaultdict(list)
 
-    for gz_path in gz_files:
+    for src_idx, gz_path in enumerate(gz_files):
         fname = os.path.basename(gz_path)
         print(f"  Parsing: {fname} ... ", end="", flush=True)
         chs, progs = parse_gz_epg(gz_path, alias_map)
-        n_ch = len(chs)
+        n_ch   = len(chs)
         n_prog = sum(len(v) for v in progs.values())
         print(f"{n_ch} canali, {n_prog} programmi")
 
@@ -292,16 +440,28 @@ def merge_epg(epg_dir: str, output_path: str, ref_path: str) -> None:
         for cid, prog_list in progs.items():
             if prog_list:
                 avg_score = sum(score_programme(p) for p in prog_list) / len(prog_list)
-                source_buckets[cid].append((avg_score, prog_list))
+                per_channel_sources[cid].append((avg_score, prog_list, src_idx))
 
-    # 4. Per ogni canale scegli la fonte con punteggio più alto
+    # 4. Cross-source deduplication per ogni canale
+    print("\nDe-duplicazione cross-source...")
     best_programmes: dict[str, list] = {}
-    for cid, sources in source_buckets.items():
-        _, best_list = max(sources, key=lambda x: x[0])
-        best_programmes[cid] = best_list
+    total_removed = 0
 
-    # 5. Aggiungi <channel> per i canali della whitelist che hanno programmi
-    #    ma non avevano un elemento <channel> in nessuna sorgente
+    for cid, sources in per_channel_sources.items():
+        # Passiamo tutte le liste sorgente al deduplicatore
+        all_lists = [prog_list for (_, prog_list, _) in sources]
+        deduped, removed = cross_source_deduplicate(all_lists)
+        best_programmes[cid] = deduped
+        if removed:
+            print(f"  {cid}: rimossi {removed} duplicati")
+            total_removed += removed
+
+    if total_removed:
+        print(f"  → Totale duplicati rimossi: {total_removed}")
+    else:
+        print("  Nessun duplicato rilevato.")
+
+    # 5. Aggiungi <channel> sintetici per canali senza elemento <channel>
     for cid in canonical_ids:
         if cid in best_programmes and cid not in all_channels:
             ch = etree.Element("channel")
@@ -310,11 +470,10 @@ def merge_epg(epg_dir: str, output_path: str, ref_path: str) -> None:
             dn.text = cid
             all_channels[cid] = ch
 
-    # 6. Costruisci l'XML finale (solo canali con programmi)
+    # 6. Costruisci l'XML finale
     tv_root = etree.Element("tv")
     tv_root.set("generator-info-name", "merge_epg.py")
 
-    # Canali con almeno un programma, ordinati per nome
     active_cids = sorted(cid for cid in all_channels if cid in best_programmes)
     for cid in active_cids:
         ch = all_channels[cid]
@@ -324,19 +483,17 @@ def merge_epg(epg_dir: str, output_path: str, ref_path: str) -> None:
             dn.text = cid
         tv_root.append(ch)
 
-    # Programmi ordinati per start time
     all_progs = [p for progs in best_programmes.values() for p in progs]
     all_progs.sort(key=lambda p: p.get("start", ""))
     for prog in all_progs:
         tv_root.append(prog)
 
-    total_ch = len(active_cids)
+    total_ch   = len(active_cids)
     total_prog = len(all_progs)
 
-    # Canali whitelist senza nessun programma
     missing = sorted(canonical_ids - set(best_programmes.keys()))
     if missing:
-        print(f"\n[INFO] {len(missing)} canali della whitelist senza programmi in nessuna sorgente:")
+        print(f"\n[INFO] {len(missing)} canali senza programmi in nessuna sorgente:")
         for m in missing:
             print(f"  - {m}")
 
