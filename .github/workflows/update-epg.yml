@@ -70,7 +70,6 @@ jobs:
             local attempt=0
             local tmpfile="${outfile}.tmp"
 
-            # UA diverso garantito per ogni tentativo
             local UA0="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
             local UA1="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0"
             local UA2="Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15"
@@ -142,17 +141,35 @@ jobs:
           echo "EPG_OK_COUNT=$ok_count" >> "$GITHUB_ENV"
           echo "EPG_FAIL_COUNT=$fail_count" >> "$GITHUB_ENV"
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installa dipendenze Python
+        run: pip install lxml
+
+      - name: Crea EPG unificato
+        shell: bash
+        run: |
+          echo "========================================"
+          echo "Avvio merge EPG..."
+          python scripts/merge_epg.py epg epg/merged_epg.xml.gz riferimento.txt
+          echo "EPG_MERGED_SIZE=$(wc -c < epg/merged_epg.xml.gz)" >> "$GITHUB_ENV"
+
       - name: Commit e push
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          # Traccia script e riferimento (solo se modificati), sempre i gz
+          git add scripts/merge_epg.py riferimento.txt 2>/dev/null || true
           git add epg/*.gz 2>/dev/null || true
 
           if git diff --cached --quiet; then
             echo "Nessuna modifica EPG"
           else
-            git commit -m "EPG aggiornato $(date -u '+%Y-%m-%d %H:%M UTC') [OK=$EPG_OK_COUNT FAIL=$EPG_FAIL_COUNT]"
+            git commit -m "EPG aggiornato $(date -u '+%Y-%m-%d %H:%M UTC') [OK=$EPG_OK_COUNT FAIL=$EPG_FAIL_COUNT merged=$(( EPG_MERGED_SIZE / 1024 ))KB]"
             git push
           fi
