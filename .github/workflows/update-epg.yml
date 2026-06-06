@@ -43,27 +43,26 @@ jobs:
           ok_count=0
           fail_count=0
 
-          declare -A site_counter
-
           make_filename() {
             local url="$1"
-            local domain base_name file_name
+            local domain site_name base_name file_name
 
-            domain=$(printf '%s' "$url" | sed -n 's|^[^/]*\/\/||; s|/[^\?]*||; s|:.*||; p' | head -1)
-            local site_name
+            # Rimuove la query string prima di tutto
+            local url_noquery="${url%%\?*}"
+
+            domain=$(printf '%s' "$url_noquery" | sed -n 's|^[^/]*\/\/||; s|/[^\?]*||; s|:.*||; p' | head -1)
             site_name=$(printf '%s' "$domain" | sed 's|^www\.||; s|\.[a-z0-9-]*$||')
 
-            base_name=$(printf '%s' "$url" | sed -n 's|^[^\?]*\/||; s|\?.*||; p' | head -1)
+            base_name=$(printf '%s' "$url_noquery" | sed -n 's|^[^\?]*\/||; s|\?.*||; p' | head -1)
             file_name=$(printf '%s' "$base_name" | sed 's|\.xml\.gz$||; s|\.gz$||; s|\.xml$||')
             file_name=$(printf '%s' "$file_name" | sed 's|xml||g; s|_*$||')
 
-            if [ -n "${site_counter[$site_name]}" ] && [ "${site_counter[$site_name]}" -gt 0 ]; then
+            # Aggiunge il filename al site_name se è presente e diverso
+            if [ -n "$file_name" ] && [ "$file_name" != "$site_name" ]; then
               printf '%s_%s\n' "$site_name" "$file_name"
             else
               printf '%s\n' "$site_name"
             fi
-
-            site_counter[$site_name]=$((${site_counter[$site_name]:-0} + 1))
           }
 
           download_url() {
