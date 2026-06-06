@@ -47,7 +47,6 @@ jobs:
             local url="$1"
             local domain site_name base_name file_name
 
-            # Rimuove la query string prima di tutto
             local url_noquery="${url%%\?*}"
 
             domain=$(printf '%s' "$url_noquery" | sed -n 's|^[^/]*\/\/||; s|/[^\?]*||; s|:.*||; p' | head -1)
@@ -57,7 +56,6 @@ jobs:
             file_name=$(printf '%s' "$base_name" | sed 's|\.xml\.gz$||; s|\.gz$||; s|\.xml$||')
             file_name=$(printf '%s' "$file_name" | sed 's|xml||g; s|_*$||')
 
-            # Aggiunge il filename al site_name se è presente e diverso
             if [ -n "$file_name" ] && [ "$file_name" != "$site_name" ]; then
               printf '%s_%s\n' "$site_name" "$file_name"
             else
@@ -71,6 +69,13 @@ jobs:
             local max_retries=3
             local attempt=0
             local tmpfile="${outfile}.tmp"
+
+            # Ignora errori SSL per siti con certificato non valido (es. epgitalia.tv)
+            local ssl_flag=""
+            if [[ "$url" == *"epgitalia"* ]]; then
+              ssl_flag="-k"
+              echo "  (SSL verify disabilitato per epgitalia.tv)"
+            fi
 
             # UA diverso garantito per ogni tentativo
             local UA0="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
@@ -92,7 +97,9 @@ jobs:
 
               rm -f "$tmpfile"
 
-              curl -L \
+              local http_code
+              http_code=$(curl -L \
+                $ssl_flag \
                 --max-time 15 \
                 --connect-timeout 8 \
                 -A "$ua" \
@@ -102,7 +109,9 @@ jobs:
                 -H "Accept-Encoding: gzip, deflate, br" \
                 -H "DNT: 1" \
                 -H "Connection: keep-alive" \
-                "$url" -o "$tmpfile" 2>/dev/null
+                -w "%{http_code}" \
+                "$url" -o "$tmpfile" 2>/dev/null)
+              echo "  HTTP status: $http_code"
 
               if [ -s "$tmpfile" ]; then
                 if file "$tmpfile" | grep -qi 'gzip'; then
