@@ -1,8 +1,8 @@
 name: Aggiorna EPG
 
 on:
-schedule:
-    - cron: '*/15 * * * *'   # ogni 15 minuti, 24 ore su 24
+  schedule:
+    - cron: "*/15 * * * *"   # ogni 15 minuti, 24 ore su 24
   workflow_dispatch:
 
 permissions:
