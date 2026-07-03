@@ -501,11 +501,20 @@
         openGroup = wasOpen ? null : groupName;
         renderChannels(els.search.value);
         if (!wasOpen){
-          // porta l'intestazione del gruppo appena aperto in cima alla vista,
-          // altrimenti la chiusura del gruppo precedente sposta il contenuto
-          // e si finisce a metà lista invece che sui primi canali.
-          const openedHead = els.groups.querySelector('.group.open .group-head');
-          if (openedHead) openedHead.scrollIntoView({ block: 'start' });
+          // Porta il gruppo appena aperto esattamente in cima alla vista.
+          // Le intestazioni sono "position: sticky", quindi scrollIntoView()
+          // e getBoundingClientRect() la considerano "già in vista" (perché
+          // visivamente resta ancorata in alto) anche quando i canali sotto
+          // non lo sono affatto. Calcoliamo quindi la posizione reale
+          // sommando le altezze dei gruppi precedenti, che non risentono
+          // dell'effetto sticky.
+          let top = 0;
+          let target = null;
+          for (const g of els.groups.children){
+            if (g.classList.contains('open')){ target = g; break; }
+            top += g.offsetHeight;
+          }
+          if (target) els.groups.scrollTop = top;
         }
       });
 
