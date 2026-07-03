@@ -318,7 +318,20 @@
   }
   .epg-modal-head span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .epg-modal-head button{padding:4px 8px; font-size:12px; flex-shrink:0;}
-  .epg-modal-body{overflow-y:auto; flex:1;}
+  .epg-day-tabs{
+    display:flex; gap:6px; padding:10px 16px; border-bottom:1px solid var(--line);
+    overflow-x:auto; flex-shrink:0;
+  }
+  .epg-day-tab{
+    font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.03em;
+    text-transform:uppercase; white-space:nowrap; flex-shrink:0;
+    padding:6px 12px; border-radius:20px; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--text-dim); cursor:pointer;
+    transition:border-color .12s, color .12s, background .12s;
+  }
+  .epg-day-tab:hover{border-color:var(--amber); color:var(--amber);}
+  .epg-day-tab.active{background:var(--amber); color:#1a1206; border-color:var(--amber);}
+  .epg-modal-body{overflow-y:auto; flex:1; scroll-behavior:smooth;}
   .epg-row{
     display:flex; gap:12px;
     padding:9px 16px;
@@ -338,10 +351,6 @@
     <div class="sidebar-head">
       <div class="brand"><span class="dot"></span> IPTV · Console</div>
       <div class="playlist-controls">
-        <div class="row">
-          <input type="text" id="m3uUrl" placeholder="URL playlist .m3u / .m3u8">
-          <button id="loadUrlBtn">Carica</button>
-        </div>
         <div class="row">
           <button class="file-btn" style="flex:1">
             File locale…
@@ -384,6 +393,7 @@
       <span id="epgModalTitle">Guida programmi</span>
       <button id="epgModalClose" type="button">✕</button>
     </div>
+    <div class="epg-day-tabs" id="epgDayTabs"></div>
     <div class="epg-modal-body" id="epgModalBody"></div>
   </div>
 </div>
@@ -398,8 +408,6 @@
     overlay: document.getElementById('overlayMsg'),
     groups: document.getElementById('groups'),
     search: document.getElementById('search'),
-    m3uUrl: document.getElementById('m3uUrl'),
-    loadUrlBtn: document.getElementById('loadUrlBtn'),
     m3uFile: document.getElementById('m3uFile'),
     playlistHint: document.getElementById('playlistHint'),
     nowPlaying: document.getElementById('nowPlaying'),
@@ -411,6 +419,7 @@
     epgModalTitle: document.getElementById('epgModalTitle'),
     epgModalBody: document.getElementById('epgModalBody'),
     epgModalClose: document.getElementById('epgModalClose'),
+    epgDayTabs: document.getElementById('epgDayTabs'),
   };
 
   let channels = [];        // { name, url, logo, group, tvgId }
@@ -627,29 +636,105 @@
   }
   setInterval(refreshNowPlayingLabels, 60000);
 
+  // ── EPG: raggruppamento per giorno (Ieri / Oggi / Domani / …) ─────
+  let currentEpgProgs = [];
+  let currentEpgDayKey = null;
+
+  function dayKeyOf(d){
+    // chiave YYYY-MM-DD in ora locale
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function dayLabelOf(key){
+    const now = new Date();
+    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const [Y, Mo, D] = key.split('-').map(Number);
+    const d = new Date(Y, Mo - 1, D);
+    const diffDays = Math.round((d - todayMidnight) / 86400000);
+    if (diffDays === 0) return 'Oggi';
+    if (diffDays === -1) return 'Ieri';
+    if (diffDays === 1) return 'Domani';
+    return d.toLocaleDateString('it-IT', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('.', '');
+  }
+
   function openEpgModal(ch){
     els.epgModalTitle.textContent = ch.name;
     els.epgModalBody.innerHTML = '';
-    const progs = (epgMap.get(ch.tvgId) || []).slice().sort((a, b) => a.start - b.start);
-    if (!progs.length){
+    els.epgDayTabs.innerHTML = '';
+    currentEpgProgs = (epgMap.get(ch.tvgId) || []).slice().sort((a, b) => a.start - b.start);
+
+    if (!currentEpgProgs.length){
       els.epgModalBody.innerHTML = '<div class="empty-state">Nessun dato EPG disponibile per questo canale.</div>';
-    } else {
-      const now = new Date();
-      for (const p of progs){
-        const row = document.createElement('div');
-        row.className = 'epg-row' + (now >= p.start && now < p.stop ? ' now' : '');
-        const time = document.createElement('span');
-        time.className = 'epg-time';
-        time.textContent = `${formatTime(p.start)}–${formatTime(p.stop)}`;
-        const title = document.createElement('span');
-        title.className = 'epg-title';
-        title.textContent = p.title;
-        row.appendChild(time);
-        row.appendChild(title);
-        els.epgModalBody.appendChild(row);
-      }
+      els.epgModal.classList.add('show');
+      return;
     }
+
+    // giorni disponibili, in ordine cronologico
+    const dayKeys = [];
+    for (const p of currentEpgProgs){
+      const k = dayKeyOf(p.start);
+      if (!dayKeys.includes(k)) dayKeys.push(k);
+    }
+    dayKeys.sort();
+
+    const todayKey = dayKeyOf(new Date());
+    const initialKey = dayKeys.includes(todayKey)
+      ? todayKey
+      : (dayKeys.find(k => k >= todayKey) || dayKeys[dayKeys.length - 1]);
+
+    for (const key of dayKeys){
+      const tab = document.createElement('button');
+      tab.type = 'button';
+      tab.className = 'epg-day-tab';
+      tab.textContent = dayLabelOf(key);
+      tab.addEventListener('click', () => selectEpgDay(key));
+      tab.dataset.key = key;
+      els.epgDayTabs.appendChild(tab);
+    }
+
+    selectEpgDay(initialKey);
     els.epgModal.classList.add('show');
+  }
+
+  function selectEpgDay(key){
+    currentEpgDayKey = key;
+
+    els.epgDayTabs.querySelectorAll('.epg-day-tab').forEach(tab => {
+      tab.classList.toggle('active', tab.dataset.key === key);
+    });
+
+    const dayProgs = currentEpgProgs.filter(p => dayKeyOf(p.start) === key);
+    els.epgModalBody.innerHTML = '';
+
+    if (!dayProgs.length){
+      els.epgModalBody.innerHTML = '<div class="empty-state">Nessun programma per questo giorno.</div>';
+      return;
+    }
+
+    const now = new Date();
+    let nowRow = null;
+    for (const p of dayProgs){
+      const row = document.createElement('div');
+      const isNow = now >= p.start && now < p.stop;
+      row.className = 'epg-row' + (isNow ? ' now' : '');
+      const time = document.createElement('span');
+      time.className = 'epg-time';
+      time.textContent = `${formatTime(p.start)}–${formatTime(p.stop)}`;
+      const title = document.createElement('span');
+      title.className = 'epg-title';
+      title.textContent = p.title;
+      row.appendChild(time);
+      row.appendChild(title);
+      els.epgModalBody.appendChild(row);
+      if (isNow) nowRow = row;
+    }
+
+    // se stiamo guardando "oggi" e c'è un programma in onda, saltaci direttamente
+    if (nowRow){
+      nowRow.scrollIntoView({ block: 'center' });
+    } else {
+      els.epgModalBody.scrollTop = 0;
+    }
   }
 
   function closeEpgModal(){
@@ -831,13 +916,6 @@
   }
 
   // ── eventi UI ───────────────────────────────────────────────────
-  els.loadUrlBtn.addEventListener('click', () => {
-    const url = els.m3uUrl.value.trim();
-    if (url) loadFromUrl(url);
-  });
-  els.m3uUrl.addEventListener('keydown', e => {
-    if (e.key === 'Enter') els.loadUrlBtn.click();
-  });
   els.m3uFile.addEventListener('change', e => {
     const file = e.target.files[0];
     if (file) loadFromFile(file);
@@ -854,7 +932,6 @@
   const AUTO_EPG_URL = 'https://raw.githubusercontent.com/xer94x/epg/main/epg/merged_epg.xml.gz';
 
   async function autoLoad(){
-    els.m3uUrl.value = AUTO_M3U_URL;
     setHint('Caricamento playlist e guida programmi da GitHub…');
 
     const [m3uText, epgOk] = await Promise.all([
