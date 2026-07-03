@@ -3,948 +3,661 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EPG Italia — Guida TV</title>
+<title>IPTV Player — Web</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.15/hls.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-:root{
-  --bg:#080c10;--surface:#0d1117;--card:#111720;--card2:#161e2a;
-  --border:#1c2535;--border2:#253040;
-  --accent:#00d4ff;--accent2:#0099cc;--accentdim:rgba(0,212,255,.1);
-  --red:#ff4d6d;--gold:#ffd166;--green:#06d6a0;
-  --text:#dde4f0;--muted:#3a4a5a;--muted2:#5a7080;--muted3:#8090a0;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 14px;height:46px;display:flex;align-items:center;gap:10px;flex-shrink:0;z-index:100}
-.logo{font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:5px}
-.logo-epg{color:var(--accent)}.logo-it{color:var(--text)}
-.logo-dot{width:5px;height:5px;border-radius:50%;background:var(--red);box-shadow:0 0 6px var(--red);animation:livepulse 2s ease-in-out infinite;flex-shrink:0}
-@keyframes livepulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--red)}50%{opacity:.3;box-shadow:0 0 2px var(--red)}}
-.hdr-clock{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted3);background:var(--card);border:1px solid var(--border);border-radius:4px;padding:3px 7px;flex-shrink:0}
-.hdr-search{background:var(--card);border:1px solid var(--border2);border-radius:5px;padding:5px 10px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:12px;outline:none;width:170px;transition:border-color .2s,width .2s}
-.hdr-search:focus{border-color:var(--accent);width:210px}
-.hdr-search::placeholder{color:var(--muted2)}
-.hdr-refresh-btn{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);color:var(--accent);padding:5px 11px;border-radius:5px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:.3px;white-space:nowrap;transition:background .15s,border-color .15s;flex-shrink:0}
-.hdr-refresh-btn:hover{background:rgba(0,212,255,.18);border-color:rgba(0,212,255,.5)}
-.hdr-status{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:10px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;color:var(--muted2);white-space:nowrap}
-.status-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:all .3s}
-.status-dot.ok{background:var(--green);box-shadow:0 0 5px var(--green)}
-.status-dot.loading{background:var(--accent);animation:blink .8s infinite}
-.status-dot.err{background:var(--red)}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.main{display:flex;flex:1;overflow:hidden}
-.ch-panel{width:430px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--surface)}
-.ch-list{flex:1;overflow-y:auto;overflow-x:hidden}
-.ch-item{display:flex;align-items:center;gap:10px;padding:14px 14px;border-bottom:1px solid rgba(255,255,255,.025);cursor:pointer;transition:background .1s;position:relative;min-height:86px}
-.ch-item:hover{background:var(--card)}
-.ch-item.active{background:var(--card2);border-left:2px solid var(--accent)}
-.ch-num{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:var(--muted);width:30px;text-align:right;flex-shrink:0}
-.ch-logo-wrap{width:50px;height:34px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);border-radius:4px;flex-shrink:0;overflow:hidden}
-.ch-logo{max-width:46px;max-height:30px;object-fit:contain;display:block}
-.ch-logo-ph{font-size:9px;font-weight:700;color:var(--muted2);text-align:center;padding:2px}
-.ch-info{flex:1;min-width:0}
-.ch-name{font-size:16px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
-.ch-now{font-size:14px;color:var(--muted3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px;line-height:1.2}
-.ch-now-title{color:var(--accent2);font-weight:500}
-.ch-prog-bar{position:absolute;bottom:0;left:0;height:2px;background:linear-gradient(90deg,var(--accent2),var(--accent));opacity:.45}
-.epg-panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.epg-header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 18px;flex-shrink:0}
-.epg-ch-title{display:flex;align-items:center;gap:12px}
-.epg-logo-wrap{width:54px;height:38px;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
-.epg-logo{max-width:48px;max-height:32px;object-fit:contain}
-.epg-logo-ph{font-size:10px;font-weight:700;color:var(--muted2);padding:4px}
-.epg-ch-name{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-.3px}
-.epg-ch-sub{font-size:11px;color:var(--muted3);margin-top:2px}
-.epg-date-tabs{display:flex;gap:4px;margin-top:10px;flex-wrap:wrap}
-.date-tab{background:transparent;border:1px solid var(--border2);border-radius:4px;padding:4px 10px;font-size:10px;font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted2);cursor:pointer;transition:all .15s;white-space:nowrap}
-.date-tab:hover{border-color:var(--accent2);color:var(--text)}
-.date-tab.active{background:var(--accentdim);border-color:rgba(0,212,255,.4);color:var(--accent)}
-.epg-list{flex:1;overflow-y:auto;padding:10px 14px}
-.prog-item{display:flex;gap:10px;padding:10px 12px;border-radius:7px;margin-bottom:5px;border:1px solid transparent;transition:background .12s,border-color .12s;position:relative;overflow:hidden}
-.prog-item:hover{background:var(--card);border-color:var(--border)}
-.prog-item.now{background:var(--card2);border-color:rgba(0,212,255,.22)}
-.prog-item.now::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:3px 0 0 3px}
-.prog-item.past{opacity:.4}
-.prog-time{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;color:var(--muted3);width:44px;flex-shrink:0;padding-top:1px;line-height:1.5}
-.prog-item.now .prog-time{color:var(--accent)}
-.prog-body{flex:1;min-width:0}
-.prog-title{font-size:15px;font-weight:600;color:var(--text);line-height:1.3}
-.prog-item.now .prog-title{color:var(--accent)}
-.prog-desc{font-size:11px;color:var(--muted3);margin-top:3px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.prog-meta{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;align-items:center}
-.prog-tag{font-size:9px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;padding:2px 6px;border-radius:3px;background:rgba(255,255,255,.05);color:var(--muted3)}
-.prog-tag.live{background:rgba(255,77,109,.12);color:var(--red);border:1px solid rgba(255,77,109,.25)}
-.prog-dur{font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace;padding-top:2px;flex-shrink:0}
-.prog-bar-wrap{width:100%;height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:5px}
-.prog-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:2px}
-.skel-ch{height:52px;background:linear-gradient(90deg,var(--card) 25%,var(--card2) 50%,var(--card) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-bottom:1px solid rgba(255,255,255,.025)}
-@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
-.center-msg{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--muted2);padding:40px;text-align:center}
-.center-msg .icon{font-size:52px;opacity:.18}
-.center-msg .ttl{font-size:15px;font-weight:600;color:var(--muted3)}
-.center-msg .sub{font-size:12px;line-height:1.6;max-width:280px}
-.retry-btn{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:var(--accent);padding:7px 16px;border-radius:5px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;transition:background .15s;margin-top:6px}
-.retry-btn:hover{background:rgba(0,212,255,.2)}
+  :root{
+    --bg:        #10141a;
+    --panel:     #171d26;
+    --panel-2:   #1d2531;
+    --line:      #2a3341;
+    --text:      #e9ebee;
+    --text-dim:  #8b95a5;
+    --amber:     #f0a83c;
+    --amber-dim: #7a5a2a;
+    --cyan:      #4fb8c4;
+    --red-live:  #e6483f;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --sans: 'Inter', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    overflow:hidden;
+  }
+
+  .app{
+    display:grid;
+    grid-template-columns: 340px 1fr;
+    height:100vh;
+  }
+
+  /* ── sidebar ─────────────────────────────────────────────────────── */
+  .sidebar{
+    background:var(--panel);
+    border-right:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+  }
+  .sidebar-head{
+    padding:16px 16px 12px;
+    border-bottom:1px solid var(--line);
+  }
+  .brand{
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:13px;
+    letter-spacing:.14em;
+    color:var(--text-dim);
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:12px;
+  }
+  .brand .dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--amber);
+    box-shadow:0 0 6px var(--amber);
+  }
+  .playlist-controls{display:flex; flex-direction:column; gap:6px;}
+  .row{display:flex; gap:6px;}
+  input[type=text]{
+    flex:1;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    padding:8px 10px;
+    border-radius:4px;
+    font-family:var(--sans);
+    font-size:12.5px;
+    min-width:0;
+  }
+  input[type=text]:focus{outline:1px solid var(--amber); border-color:var(--amber);}
+  button{
+    font-family:var(--mono);
+    font-size:11.5px;
+    font-weight:600;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    border-radius:4px;
+    border:1px solid var(--line);
+    background:var(--panel-2);
+    color:var(--text);
+    padding:8px 12px;
+    cursor:pointer;
+    transition:border-color .12s, color .12s;
+  }
+  button:hover{border-color:var(--amber); color:var(--amber);}
+  button:focus-visible{outline:2px solid var(--amber); outline-offset:1px;}
+  button.primary{
+    background:var(--amber);
+    color:#1a1206;
+    border-color:var(--amber);
+  }
+  button.primary:hover{background:#f5b859; color:#1a1206;}
+  .file-btn{position:relative; overflow:hidden;}
+  .file-btn input[type=file]{
+    position:absolute; inset:0; opacity:0; cursor:pointer;
+  }
+  .hint{font-size:11px; color:var(--text-dim); margin-top:2px; font-family:var(--mono);}
+
+  .search-box{padding:10px 16px; border-bottom:1px solid var(--line);}
+  .search-box input{width:100%;}
+
+  .groups{flex:1; overflow-y:auto; min-height:0;}
+  .group{border-bottom:1px solid var(--line);}
+  .group-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:9px 16px;
+    cursor:pointer;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    background:var(--panel);
+    position:sticky; top:0; z-index:1;
+  }
+  .group-head:hover{color:var(--text);}
+  .group-head .count{color:var(--text-dim); font-weight:400;}
+  .group-body{display:none;}
+  .group.open .group-body{display:block;}
+  .group.open .chevron{transform:rotate(90deg);}
+  .chevron{transition:transform .12s; font-size:10px;}
+
+  .channel{
+    display:flex; align-items:center; gap:10px;
+    padding:8px 16px 8px 22px;
+    cursor:pointer;
+    border-left:2px solid transparent;
+  }
+  .channel:hover{background:var(--panel-2);}
+  .channel.active{
+    background:var(--panel-2);
+    border-left-color:var(--amber);
+  }
+  .channel.active .ch-name{color:var(--amber);}
+  .ch-logo{
+    width:26px; height:26px;
+    border-radius:4px;
+    background:var(--panel-2);
+    object-fit:contain;
+    flex-shrink:0;
+    border:1px solid var(--line);
+  }
+  .ch-name{
+    font-size:12.5px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    flex:1;
+  }
+  .empty-state{
+    padding:40px 20px;
+    text-align:center;
+    color:var(--text-dim);
+    font-family:var(--mono);
+    font-size:12px;
+    line-height:1.7;
+  }
+
+  /* ── main / player ───────────────────────────────────────────────── */
+  .main{
+    display:flex; flex-direction:column;
+    min-width:0; min-height:0;
+    background:#000;
+  }
+  .topbar{
+    display:flex; align-items:center; gap:12px;
+    padding:12px 20px;
+    background:var(--panel);
+    border-bottom:1px solid var(--line);
+  }
+  .live-tag{
+    font-family:var(--mono);
+    font-size:10.5px; font-weight:700;
+    letter-spacing:.08em;
+    color:#fff;
+    background:var(--red-live);
+    padding:3px 7px;
+    border-radius:3px;
+    display:flex; align-items:center; gap:5px;
+    visibility:hidden;
+  }
+  .live-tag.on{visibility:visible;}
+  .live-tag .pulse{
+    width:6px;height:6px;border-radius:50%;
+    background:#fff;
+    animation:pulse 1.4s infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+  .now-playing{
+    font-family:var(--mono);
+    font-size:13.5px;
+    font-weight:600;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .now-playing.dim{color:var(--text-dim); font-weight:400;}
+  .topbar-right{margin-left:auto; display:flex; align-items:center; gap:10px;}
+  .status-pill{
+    font-family:var(--mono);
+    font-size:10.5px;
+    color:var(--text-dim);
+    border:1px solid var(--line);
+    padding:3px 8px;
+    border-radius:3px;
+  }
+
+  .video-wrap{
+    flex:1;
+    position:relative;
+    min-height:0;
+    background:#000;
+  }
+  video{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:contain;
+    background:#000;
+  }
+  .placeholder{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    color:var(--text-dim);
+    font-family:var(--mono);
+    font-size:12px;
+    text-align:center;
+  }
+  .overlay-msg{
+    position:absolute; inset:0;
+    display:none;
+    align-items:center; justify-content:center;
+    background:rgba(10,12,16,.82);
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:var(--amber);
+    text-align:center;
+    padding:20px;
+  }
+  .overlay-msg.show{display:flex;}
+
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+
+  @media (max-width: 760px){
+    .app{grid-template-columns: 1fr;}
+    .sidebar{
+      position:fixed; z-index:20; top:4px; bottom:0; left:0; width:82vw; max-width:340px;
+      transform:translateX(-100%);
+      transition:transform .18s ease;
+    }
+    .sidebar.open{transform:translateX(0);}
+    .menu-btn{display:inline-flex !important;}
+  }
+  .menu-btn{display:none;}
 </style>
 </head>
 <body>
-<header>
-  <div class="logo"><span class="logo-epg">EPG</span><span class="logo-it">Italia</span><div class="logo-dot"></div></div>
-  <div class="hdr-clock" id="clock">--:--:--</div>
-  <input class="hdr-search" id="search" type="text" placeholder="🔍 Cerca canale..." oninput="filterChannels()">
 
-  <div class="hdr-status"><div class="status-dot loading" id="sdot"></div><span id="stxt">Caricamento...</span></div>
-</header>
-<div class="main">
-  <div class="ch-panel">
-    <div class="ch-list" id="chList"></div>
-  </div>
-  <div class="epg-panel">
-    <div class="epg-header" id="epgHeader" style="display:none">
-      <div class="epg-ch-title">
-        <div class="epg-logo-wrap">
-          <img class="epg-logo" id="epgLogo" src="" alt="" onerror="this.style.display='none';document.getElementById('epgLogoPh').style.display=''">
-          <div id="epgLogoPh" class="epg-logo-ph" style="display:none"></div>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <div class="brand"><span class="dot"></span> IPTV · Console</div>
+      <div class="playlist-controls">
+        <div class="row">
+          <input type="text" id="m3uUrl" placeholder="URL playlist .m3u / .m3u8">
+          <button id="loadUrlBtn">Carica</button>
         </div>
-        <div>
-          <div class="epg-ch-name" id="epgChName">—</div>
-          <div class="epg-ch-sub" id="epgChSub">Seleziona una data</div>
+        <div class="row">
+          <button class="file-btn" style="flex:1">
+            File locale…
+            <input type="file" id="m3uFile" accept=".m3u,.m3u8,text/plain">
+          </button>
         </div>
       </div>
-      <div class="epg-date-tabs" id="dateTabs"></div>
+      <div class="hint" id="playlistHint">Nessuna playlist caricata</div>
     </div>
-    <div class="epg-list" id="epgList">
-      <div class="center-msg"><div class="icon">📺</div><div class="ttl">Guida TV Italia</div><div class="sub">Seleziona un canale dalla lista per vedere la programmazione completa</div></div>
+    <div class="search-box">
+      <input type="text" id="search" placeholder="Cerca canale…">
     </div>
-  </div>
+    <div class="groups" id="groups">
+      <div class="empty-state">Carica una playlist M3U (URL o file)<br>per vedere i canali qui.</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <button class="menu-btn" id="menuBtn" title="Canali">☰</button>
+      <span class="live-tag" id="liveTag"><span class="pulse"></span>ON AIR</span>
+      <span class="now-playing dim" id="nowPlaying">Nessun canale selezionato</span>
+      <div class="topbar-right">
+        <span class="status-pill" id="statusPill">STANDBY</span>
+      </div>
+    </div>
+    <div class="video-wrap">
+      <video id="video" controls playsinline></video>
+      <div class="placeholder" id="placeholder">
+        <div>NESSUN SEGNALE — seleziona un canale dalla lista</div>
+      </div>
+      <div class="overlay-msg" id="overlayMsg"></div>
+    </div>
+  </main>
 </div>
+
 <script>
-// ═══════════════════════════════════════════════════
-// DATABASE LOCALE CANALI ITALIANI
-// Numerazione ufficiale + logo tvchannellists.com
-// Mapping EPG: ogni entry ha aliases per abbinare i
-// nomi che arriva dal feed EPG Italia
-// ═══════════════════════════════════════════════════
-const LOCAL_CHANNELS=[
-  {lcn:1,  name:'Rai 1',            tvgId:'Rai1.it',                 logo:'https://iptv-epg.org/logos/Italy/Rai1.it.png',                    aliases:['rai 1','rai1','rai uno']},
-  {lcn:2,  name:'Rai 2',            tvgId:'Rai2.it',                 logo:'https://iptv-epg.org/logos/Italy/Rai2.it.png',                    aliases:['rai 2','rai2','rai due']},
-  {lcn:3,  name:'Rai 3',            tvgId:'Rai3.it',                 logo:'https://iptv-epg.org/logos/Italy/Rai3.it.png',                    aliases:['rai 3','rai3','rai tre']},
-  {lcn:4,  name:'Rete 4',           tvgId:'Rete4.it',                logo:'https://iptv-epg.org/logos/Italy/Rete4.it.png',                   aliases:['rete 4','rete4','rete quattro']},
-  {lcn:5,  name:'Canale 5',         tvgId:'Canale5.it',              logo:'https://iptv-epg.org/logos/Italy/Canale5.it.png',                 aliases:['canale 5','canale5','canale cinque']},
-  {lcn:6,  name:'Italia 1',         tvgId:'Italia1.it',              logo:'https://iptv-epg.org/logos/Italy/Italia1.it.png',                 aliases:['italia 1','italia1']},
-  {lcn:7,  name:'LA7',              tvgId:'LA7.it',                  logo:'https://raw.githubusercontent.com/xer94x/tv/9dee71eb5c11633a918de0e0ee049045803deff0/loghi/La_7.svg',                     aliases:['la7','la 7']},
-  {lcn:8,  name:'TV8',              tvgId:'TV8.it',                  logo:'https://iptv-epg.org/logos/Italy/TV8.it.png',                     aliases:['tv8','tv 8']},
-  {lcn:9,  name:'Nove',             tvgId:'NOVE.it',                 logo:'https://iptv-epg.org/logos/Italy/NOVE.it.png',                    aliases:['nove']},
-  {lcn:10, name:'Rai 4',            tvgId:'Rai4.it',                 logo:'https://iptv-epg.org/logos/Italy/Rai4.it.png',                    aliases:['rai 4','rai4']},
-  {lcn:11, name:'Iris',             tvgId:'Iris.it',                 logo:'https://iptv-epg.org/logos/Italy/Iris.it.png',                    aliases:['iris']},
-  {lcn:12, name:'La 5',             tvgId:'La5.it',                  logo:'https://iptv-epg.org/logos/Italy/La5.it.png',                     aliases:['la 5','la5']},
-  {lcn:13, name:'Rai 5',            tvgId:'Rai5.it',                 logo:'https://iptv-epg.org/logos/Italy/Rai5.it.png',                    aliases:['rai 5','rai5']},
-  {lcn:14, name:'Rai Movie',        tvgId:'RaiMovie.it',             logo:'https://iptv-epg.org/logos/Italy/RaiMovie.it.png',                aliases:['rai movie','raimovie']},
-  {lcn:15, name:'Rai Premium',      tvgId:'RaiPremium.it',           logo:'https://iptv-epg.org/logos/Italy/RaiPremium.it.png',              aliases:['rai premium','raipremium']},
-  {lcn:16, name:'Italia 2',         tvgId:'Italia2.it',              logo:'https://iptv-epg.org/logos/Italy/Italia2.it.png',                 aliases:['italia 2','italia2']},
-  {lcn:17, name:'Mediaset Extra',   tvgId:'MediasetExtra.it',        logo:'https://iptv-epg.org/logos/Italy/MediasetExtra.it.png',           aliases:['mediaset extra']},
-  {lcn:18, name:'TV2000',           tvgId:'TV2000.it',               logo:'https://iptv-epg.org/logos/Italy/TV2000.it.png',                  aliases:['tv2000','tv 2000']},
-  {lcn:19, name:'Cielo',            tvgId:'cielo.it',                logo:'https://iptv-epg.org/logos/Italy/cielo.it.png',                   aliases:['cielo']},
-  {lcn:20, name:'20',               tvgId:'Mediaset20.it',           logo:'https://iptv-epg.org/logos/Italy/Mediaset20.it.png',              aliases:['20','venti','twenty','20 mediaset']},
-  {lcn:21, name:'Rai Sport',        tvgId:'RAISport.it',             logo:'https://iptv-epg.org/logos/Italy/RAISport.it.png',                aliases:['rai sport','raisport']},
-  {lcn:22, name:'Focus',            tvgId:'Focus.it',                logo:'https://iptv-epg.org/logos/Italy/Focus.it.png',                   aliases:['focus']},
-  {lcn:23, name:'Rai Storia',       tvgId:'RaiStoria.it',            logo:'https://iptv-epg.org/logos/Italy/RaiStoria.it.png',               aliases:['rai storia','raistoria']},
-  {lcn:24, name:'Rai News 24',      tvgId:'RaiNews24.it',            logo:'https://iptv-epg.org/logos/Italy/RaiNews24.it.png',               aliases:['rai news 24','rainews24','rai news']},
-  {lcn:25, name:'TGcom24',          tvgId:'TGcom24.it',              logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/180px-TGcom24.png', aliases:['tgcom24','tgcom 24','tg com 24']},
-  {lcn:26, name:'Rai Scuola',       tvgId:'RaiScuola.it',            logo:'https://iptv-epg.org/logos/Italy/RaiScuola.it.png',               aliases:['rai scuola','raiscuola']},
-  {lcn:27, name:'TwentySeven',      tvgId:'Mediaset27Twentyseven.it',logo:'https://iptv-epg.org/logos/Italy/Mediaset27Twentyseven.it.png',   aliases:['twentyseven','27','twenty seven']},
-  {lcn:28, name:'DMAX',             tvgId:'DMAX.it',                 logo:'https://iptv-epg.org/logos/Italy/DMAX.it.png',                    aliases:['dmax']},
-  {lcn:29, name:'La7 Cinema',       tvgId:'La7d.it',                 logo:'https://github.com/xer94x/tv/blob/main/loghi/100px-LA7_Cinema.png',                    aliases:['la7 cinema','la7d','la 7 cinema','la7cinema']},
-  {lcn:30, name:'wedotv Movies',    logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/160px-Wedotv_Movies.png', aliases:['wedotv movies','wedotv']},
-  {lcn:31, name:'Real Time',        tvgId:'RealTime.it',             logo:'https://iptv-epg.org/logos/Italy/RealTime.it.png',                aliases:['real time','realtime']},
-  {lcn:32, name:'QVC',              tvgId:'QVC.it',                  logo:'https://iptv-epg.org/logos/Italy/QVC.it.png',                     aliases:['qvc']},
-  {lcn:33, name:'Food Network',     tvgId:'FoodNetwork.it',          logo:'https://iptv-epg.org/logos/Italy/FoodNetwork.it.png',             aliases:['food network','foodnetwork']},
-  {lcn:34, name:'Cine34',           tvgId:'Cine34.it',               logo:'https://iptv-epg.org/logos/Italy/Cine34.it.png',                  aliases:['cine34','cine 34']},
-  {lcn:35, name:'Radio Italia TV',  tvgId:'RadioItaliaTV.it',        logo:'https://iptv-epg.org/logos/Italy/RadioItaliaTV.it.png',           aliases:['radio italia tv','radioitalia tv']},
-  {lcn:36, name:'RTL 102.5 TV',     tvgId:'RTL1025.it',              logo:'https://iptv-epg.org/logos/Italy/RTL1025.it.png',                 aliases:['rtl 102.5 tv','rtl 102.5','rtl102.5']},
-  {lcn:37, name:'Discovery',        tvgId:'Discovery.it',            logo:'https://iptv-epg.org/logos/Italy/Discovery.it.png',               aliases:['discovery','discovery channel']},
-  {lcn:38, name:'Giallo',           tvgId:'GIALLO.it',               logo:'https://iptv-epg.org/logos/Italy/GIALLO.it.png',                  aliases:['giallo']},
-  {lcn:39, name:'Top Crime',        tvgId:'TOPcrime.it',             logo:'https://iptv-epg.org/logos/Italy/TOPcrime.it.png',                aliases:['top crime','topcrime']},
-  {lcn:40, name:'Boing',            tvgId:'Boing.it',                logo:'https://iptv-epg.org/logos/Italy/Boing.it.png',                   aliases:['boing']},
-  {lcn:41, name:'Cartoonito',       tvgId:'CARTOONITO.it',           logo:'https://iptv-epg.org/logos/Italy/CARTOONITO.it.png',              aliases:['cartoonito']},
-  {lcn:42, name:'Rai Gulp',         tvgId:'RaiGulp.it',              logo:'https://iptv-epg.org/logos/Italy/RaiGulp.it.png',                 aliases:['rai gulp','raigulp']},
-  {lcn:43, name:'Rai Yoyo',         tvgId:'RaiYoyo.it',              logo:'https://iptv-epg.org/logos/Italy/RaiYoyo.it.png',                 aliases:['rai yoyo','raiyoyo']},
-  {lcn:44, name:'Frisbee',          tvgId:'-frisbee-.it',            logo:'https://iptv-epg.org/logos/Italy/-frisbee-.it.png',               aliases:['frisbee']},
-  {lcn:46, name:'K2',               tvgId:'K2.it',                   logo:'https://iptv-epg.org/logos/Italy/K2.it.png',                      aliases:['k2']},
-  {lcn:47, name:'Super!',           tvgId:'Super!.it',               logo:'https://iptv-epg.org/logos/Italy/Super%21.it.png',                aliases:['super!','super']},
-  {lcn:48, name:'ARTE',             tvgId:'ARTE.it',                 logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Arte.svg', aliases:['arte']},
-  {lcn:49, name:'Mezzo',            logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Mezzo.svg', aliases:['mezzo']},
-  {lcn:50, name:'RDS Social TV',    tvgId:'RDSSocialTV.it',          logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/RDS_Social_TV.svg', aliases:['rds social tv','rds']},
-  {lcn:51, name:'EQUtv',            logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/140px-RTL_102.5.svg.png', aliases:['equtv','equ tv']},
-  {lcn:52, name:'ACI Sport TV',     logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/190px-ACI_Sport_TV.png', aliases:['aci sport tv','aci sport']},
-  {lcn:54, name:'Solo Calcio',      logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/140px-RTL_102.5.svg.png', aliases:['solo calcio']},
-  {lcn:55, name:'Marcopolo Travel TV',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/140px-RTL_102.5.svg.png', aliases:['marcopolo travel tv','marcopolo']},
-  {lcn:56, name:'HGTV',             tvgId:'HGTV.it',                 logo:'https://iptv-epg.org/logos/Italy/HGTV.it.png',                    aliases:['hgtv','home garden','home & garden']},
-  {lcn:58, name:'Euronews',         tvgId:'Euronews.it',             logo:'https://iptv-epg.org/logos/Italy/Euronews.it.png',                aliases:['euronews','euro news']},
-  {lcn:59, name:'Discovery Turbo',  tvgId:'MotorTrend.it',           logo:'https://iptv-epg.org/logos/Italy/MotorTrend.it.png',              aliases:['discovery turbo','motor trend','motortrend','discoveryturbo']},
-  {lcn:60, name:'wedotv Big Stories',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/180px-Wedotv_Big_Stories.png', aliases:['wedotv big stories']},
-  {lcn:61, name:'Juwelo',           logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Juwelo.svg', aliases:['juwelo']},
-  {lcn:62, name:'RTL 102.5 Caliente',tvgId:'RTL1025Caliente.it',    logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/RTL_102.5.svg', aliases:['rtl 102.5 caliente','rtl caliente']},
-  {lcn:63, name:'Radio Italia Live TV',tvgId:'RadioItaliaTrendTv.it',logo:'https://iptv-epg.org/logos/Italy/RadioItaliaTrendTv.it.png',      aliases:['radio italia live tv','radio italia live']},
-  {lcn:64, name:'Radio Kiss Kiss TV',tvgId:'RadioKissKiss.it',       logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/100px-Radio_Kiss_Kiss.png', aliases:['radio kiss kiss tv','kiss kiss tv']},
-  {lcn:65, name:'Radio Zeta TV',    tvgId:'RadioZeta.it',            logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Radio_Zeta.svg', aliases:['radio zeta tv','radio zeta']},
-  {lcn:66, name:'Radio Freccia TV', logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/160px-Radio_Freccia.png', aliases:['radio freccia tv','radio freccia']},
-  {lcn:67, name:'Radio Monte Carlo TV',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/60px-RMC_Logo.png', aliases:['radio monte carlo tv','radio monte carlo']},
-  {lcn:68, name:'Virgin Radio TV',  tvgId:'VirginRadioTV.it',        logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Virgin_Radio.svg', aliases:['virgin radio tv','virgin radio']},
-  {lcn:69, name:'France 24 English',tvgId:'France24English.it',      logo:'https://iptv-epg.org/logos/Italy/France24English.it.png',         aliases:['france 24 english','france 24']},
-  {lcn:70, name:'BBC News',         tvgId:'BBCWorldNews.it',         logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/BBC_News.svg', aliases:['bbc news','bbcnews']},
-  {lcn:71, name:'Al Jazeera English',tvgId:'AlJazeeraIntl.it',       logo:'https://iptv-epg.org/logos/Italy/AlJazeeraIntl.it.png',           aliases:['al jazeera english','al jazeera']},
-  {lcn:72, name:'TRT World',        tvgId:'TRTWorld.it',             logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/TRT_World.svg', aliases:['trt world','trtworld']},
-  {lcn:73, name:'NHK World TV',     tvgId:'NHKWorld.it',             logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/NHK_World-Japan.svg', aliases:['nhk world tv','nhk world','nhk']},
-  {lcn:74, name:'FREEДОМ',          logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/FREEДОМ.svg', aliases:['freeдом','freedom']},
-  {lcn:75, name:'France 24 FR',     tvgId:'France24Francais.it',     logo:'https://iptv-epg.org/logos/Italy/France24Francais.it.png',        aliases:['france 24 français','france 24 francais','france 24 en français','france 24 fr']},
-  {lcn:76, name:'DIM',              logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/160px-DIM.png', aliases:['dim']},
-  {lcn:77, name:'Al Jazeera',       logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Al_Jazeera.svg', aliases:['al jazeera']},
-  {lcn:79, name:'Sonlife Broadcasting',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/160px-SonLife_Broadcasting_Network.png', aliases:['sonlife broadcasting network','sonlife']},
-  {lcn:81, name:'CNBC',             tvgId:'CNBC.it',                 logo:'https://iptv-epg.org/logos/Italy/CNBC.it.png',                    aliases:['cnbc']},
-  {lcn:82, name:'Bloomberg',        tvgId:'Bloomberg.it',            logo:'https://iptv-epg.org/logos/Italy/Bloomberg.it.png',               aliases:['bloomberg','bloomberg television','bloomberg tv']},
-  {lcn:83, name:'Daystar',          logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Daystar.svg', aliases:['daystar']},
-  {lcn:85, name:'DW English',       tvgId:'DWEnglish.it',            logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/DW.svg', aliases:['dw english','dw','deutsche welle']},
-  {lcn:86, name:'Euronews English', logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Euronews.svg', aliases:['euronews english']},
-  {lcn:87, name:'CGTN',             tvgId:'CGTN.it',                 logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/CGTN.svg', aliases:['cgtn']},
-  {lcn:88, name:'CGTN Documentary', logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/CGTN_Documentary.svg', aliases:['cgtn documentary']},
-  {lcn:89, name:'Senato TV',        tvgId:'SenatoTV.it',             logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Senato_TV.svg', aliases:['senato tv','senato']},
-  {lcn:90, name:'Camera dei Deputati',tvgId:'Camera.it',             logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/100px-Camera_dei_deputati.png', aliases:['camera dei deputati','camera']},
-  {lcn:91, name:'KBS World',        tvgId:'KBSWorld.it',             logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/KBS_World.svg', aliases:['kbs world','kbs']},
-  {lcn:92, name:'CCTV-4 Europe',    logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/CCTV-4.svg', aliases:['cctv-4 europe','cctv 4']},
-  {lcn:93, name:'Rai Radio 2 Visual',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/140px-RTL_102.5.svg.png', aliases:['rai radio 2 visual','rai radio 2']},
-  {lcn:94, name:'Rai 4K',           logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Rai_4K.svg', aliases:['rai 4k']},
-  {lcn:95, name:'RSI La1', tvgId:'rsila1.it', logo:'https://i.ibb.co/tTmYH1qK/RSI-La-1.png', aliases:[]},
-  {lcn:96, name:'RSI La2', tvgId:'rsila2.it', logo:'https://i.ibb.co/hx4d5d7Z/RSI-La-2.png', aliases:[]},
-  {lcn:100, name:'Sky TG24',         tvgId:'SkyTG24.it',              logo:'https://iptv-epg.org/logos/Italy/SkyTG24.it.png',                 aliases:['sky tg24','skytg24','sky tg 24']},
-  {lcn:108, name:'Sky Uno',          tvgId:'SkyUno.it',               logo:'https://iptv-epg.org/logos/Italy/SkyUno.it.png',                   aliases:['sky uno']},
-  {lcn:109, name:'Sky Uno +1',       logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Sky_Uno_+.svg', aliases:['sky uno +1','sky uno+1']},
-  {lcn:111, name:'Sky Atlantic',     tvgId:'SkyAtlantic.it',          logo:'https://iptv-epg.org/logos/Italy/SkyAtlantic.it.png',              aliases:['sky atlantic']},
-  {lcn:112, name:'Sky Serie',        tvgId:'SkySerie.it',             logo:'https://iptv-epg.org/logos/Italy/SkySerie.it.png',                 aliases:['sky serie']},
-  {lcn:113, name:'Sky Investigation',tvgId:'SkyInvestigation.it',     logo:'https://iptv-epg.org/logos/Italy/SkyInvestigation.it.png',         aliases:['sky investigation']},
-  {lcn:114, name:'Sky Collection',   logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Sky_Collection.svg', aliases:['sky collection']},
-  {lcn:115, name:'Sky Crime',        tvgId:'SkyCrime.it',             logo:'https://iptv-epg.org/logos/Italy/SkyCrime.it.png',                 aliases:['sky crime']},
-  {lcn:116, name:'History',          tvgId:'History.it',              logo:'https://iptv-epg.org/logos/Italy/History.it.png',                  aliases:['history','history channel']},
-  {lcn:117, name:'Sky Documentaries',tvgId:'SkyDocumentaries.it',     logo:'https://iptv-epg.org/logos/Italy/SkyDocumentaries.it.png',         aliases:['sky documentaries']},
-  {lcn:118, name:'Sky Adventure',    logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/200px-Sky_Adventure.png', aliases:['sky adventure']},
-  {lcn:119, name:'Sky Nature',       tvgId:'SkyNature.it',            logo:'https://iptv-epg.org/logos/Italy/SkyNature.it.png',                aliases:['sky nature']},
-  {lcn:120, name:'Sky Arte',         tvgId:'SkyArte.it',              logo:'https://iptv-epg.org/logos/Italy/SkyArte.it.png',                  aliases:['sky arte']},
-  {lcn:121, name:'Sky Classica',     logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/200px-Sky_Classica.png', aliases:['sky classica']},
-  {lcn:129, name:'Comedy Central',   tvgId:'ComedyCentral.it',        logo:'https://iptv-epg.org/logos/Italy/ComedyCentral.it.png',            aliases:['comedy central']},
-  {lcn:131, name:'MTV',              tvgId:'MTV.it',                  logo:'https://iptv-epg.org/logos/Italy/MTV.it.png',                      aliases:['mtv']},
-  {lcn:133, name:'Gambero Rosso',    tvgId:'GamberoRosso.it',         logo:'https://iptv-epg.org/logos/Italy/GamberoRosso.it.png',             aliases:['gambero rosso channel','gambero rosso']},
-  {lcn:200, name:'Sky Sport 24',     tvgId:'SkySport24.it',           logo:'https://iptv-epg.org/logos/Italy/SkySport24.it.png',              aliases:['sky sport 24']},
-  {lcn:201, name:'Sky Sport Uno',    tvgId:'SkySportUno.it',          logo:'https://iptv-epg.org/logos/Italy/SkySportUno.it.png',             aliases:['sky sport uno','sky sport 1']},
-  {lcn:202, name:'Sky Sport Calcio', tvgId:'SkySportCalcio.it',       logo:'https://iptv-epg.org/logos/Italy/SkySportCalcio.it.png',          aliases:['sky sport calcio']},
-  {lcn:203, name:'Sky Sport Tennis', tvgId:'SkySportTennis.it',       logo:'https://iptv-epg.org/logos/Italy/SkySportTennis.it.png',          aliases:['sky sport tennis']},
-  {lcn:204, name:'Sky Sport Arena',  tvgId:'SkySportArena.it',        logo:'https://iptv-epg.org/logos/Italy/SkySportArena.it.png',           aliases:['sky sport arena']},
-  {lcn:205, name:'Sky Sport Basket', tvgId:'SkySportNBA.it',       logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Sky_Sport_Basket_-_Logo_2025%20(1).svg', aliases:['sky sport basket, IT - Sky Sport NBA']},
-  {lcn:206, name:'Sky Sport Max',    tvgId:'SkySportMax.it',          logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/200px-Sky_Sport_Max.png', aliases:['sky sport max']},
-  {lcn:207, name:'Sky Sport F1',     tvgId:'SkySportF1.it',           logo:'https://iptv-epg.org/logos/Italy/SkySportF1.it.png',              aliases:['sky sport f1','sky f1']},
-  {lcn:208, name:'Sky Sport MotoGP', tvgId:'SkySportMotoGP.it',       logo:'https://iptv-epg.org/logos/Italy/SkySportMotoGP.it.png',          aliases:['sky sport motogp','sky motogp']},
-  {lcn:209, name:'Sky Sport Golf',   tvgId:'SkySportGolf.it',         logo:'https://iptv-epg.org/logos/Italy/SkySportGolf.it.png',            aliases:['sky sport golf']},
-  {lcn:210, name:'Sky Sport Legend', logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Sky_Sport_Legend%20(1).svg', aliases:['sky sport legend']},
-  {lcn:211, name:'Sky Sport Mix',    logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Sky_Sport_Mix.svg', aliases:['sky sport mix']},
-  {lcn:212, name:'SuperTennis',      tvgId:'SuperTennis.it',          logo:'https://iptv-epg.org/logos/Italy/SuperTennis.it.png',             aliases:['supertennis','super tennis']},
-  {lcn:213, name:'Sky Sport 4K',     logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Sky_Sport_4K.svg', aliases:['sky sport 4k']},
-  {lcn:214, name:'DAZN1',          tvgId:'ZONADAZN.it',             logo:'https://iptv-epg.org/logos/Italy/ZONADAZN.it.png',                aliases:['dazn 1','dazn1','zona dazn','it - zona dazn']},
-  {lcn:215, name:'DAZN2',          tvgId:'ZONADAZN2.it',            logo:'https://iptv-epg.org/logos/Italy/ZONADAZN2.it.png',               aliases:['dazn 2','dazn2','zona dazn 2', 'it - zona dazn 2']},
-  {lcn:216, name:'Eurosport 1',      tvgId:'Eurosport.it',            logo:'https://iptv-epg.org/logos/Italy/Eurosport.it.png',               aliases:['eurosport 1','eurosport1']},
-  {lcn:217, name:'Eurosport 2',      tvgId:'Eurosport2.it',           logo:'https://iptv-epg.org/logos/Italy/Eurosport2.it.png',              aliases:['eurosport 2','eurosport2']},
-  {lcn:220, name:'EQUtv',    logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/140px-RTL_102.5.svg.png', aliases:[]},
-  {lcn:221, name:'Horse TV',         logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/160px-Horse_TV.png', aliases:['horse tv']},
-  {lcn:222, name:'Bike Channel',     logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Bike_Channel.png', aliases:['bike channel']},
-  {lcn:230, name:'Milan TV',         tvgId:'MilanTV.it',              logo:'https://iptv-epg.org/logos/Italy/MilanTV.it.png',                 aliases:['milan tv','milantv']},
-  {lcn:232, name:'Inter TV',         tvgId:'InterTV.it',              logo:'https://iptv-epg.org/logos/Italy/InterTV.it.png',                 aliases:['inter tv','intertv']},
-  {lcn:235, name:'Caccia',           logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Caccia_e_Pesca.svg', aliases:['caccia']},
-  {lcn:236, name:'Pesca',            logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Caccia_e_Pesca.svg', aliases:['pesca']},
-  {lcn:300, name:'Sky Cinema Uno',   tvgId:'SkyCinemaUno.it',         logo:'https://iptv-epg.org/logos/Italy/SkyCinemaUno.it.png',             aliases:['sky cinema uno']},
-  {lcn:301, name:'Sky Cinema Due',    tvgId:'SkyCinemaDue.it',        logo:'https://iptv-epg.org/logos/Italy/SkyCinemaDue.it.png',            aliases:['sky cinema due','sky cinema 2']},
-  {lcn:302, name:'Sky Cinema Collection',tvgId:'SkyCinemaCollection.it',logo:'https://iptv-epg.org/logos/Italy/SkyCinemaCollection.it.png',  aliases:['sky cinema collection']},
-  {lcn:303, name:'Sky Cinema Family', tvgId:'SkyCinemaFamily.it',     logo:'https://iptv-epg.org/logos/Italy/SkyCinemaFamily.it.png',         aliases:['sky cinema family']},
-  {lcn:304, name:'Sky Cinema Action', tvgId:'SkyCinemaAction.it',     logo:'https://iptv-epg.org/logos/Italy/SkyCinemaAction.it.png',         aliases:['sky cinema action']},
-  {lcn:305, name:'Sky Cinema Suspense',tvgId:'SkyCinemaSuspense.it',  logo:'https://iptv-epg.org/logos/Italy/SkyCinemaSuspense.it.png',       aliases:['sky cinema suspense']},
-  {lcn:306, name:'Sky Cinema Comedy', tvgId:'SkyCinemaComedy.it',     logo:'https://iptv-epg.org/logos/Italy/SkyCinemaComedy.it.png',         aliases:['sky cinema comedy']},
-  {lcn:307, name:'Sky Cinema Romance',tvgId:'SkyCinemaRomance.it',    logo:'https://iptv-epg.org/logos/Italy/SkyCinemaRomance.it.png',        aliases:['sky cinema romance']},
-  {lcn:308, name:'Sky Cinema Drama',  tvgId:'SkyCinemaDrama.it',      logo:'https://iptv-epg.org/logos/Italy/SkyCinemaDrama.it.png',          aliases:['sky cinema drama']},
-  {lcn:475, name:'QVC',        logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/QVC.svg', aliases:[]},
-  {lcn:489, name:'Fashion TV',       logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Fashion_TV.svg', aliases:['fashion tv']},
-  {lcn:490, name:'Value 24 TV',      logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/140px-RTL_102.5.svg.png', aliases:['value 24 tv']},
-  {lcn:501, name:'Sky TG24 Primo Piano',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Sky_TG24.svg', aliases:['sky tg24 primo piano']},
-  {lcn:502, name:'Sky Meteo 24',     logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Sky_Meteo_24.svg', aliases:['sky meteo 24','sky meteo']},
-  {lcn:515, name:'Vatican Media Europe',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/140px-RTL_102.5.svg.png', aliases:['vatican media europe','vatican media']},
-  {lcn:519, name:'TRM',              logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/180px-TRM.png', aliases:['trm']},
-  {lcn:521, name:'Euronews',   logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Euronews.svg', aliases:[]},
-  {lcn:522, name:'Sky News',         logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Sky_News.svg', aliases:['sky news']},
-  {lcn:526, name:'CNN International',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/CNN_International.svg', aliases:['cnn international','cnn']},
-  {lcn:530, name:'BBC World News',   logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/BBC_World_News.svg', aliases:['bbc world news','bbc world']},
-  {lcn:532, name:'Al Jazeera International',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Al_Jazeera_English.svg', aliases:['al jazeera international']},
-  {lcn:534, name:'Arirang TV',       logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Arirang_TV.svg', aliases:['arirang tv','arirang']},
-  {lcn:538, name:'Euronews English',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Euronews.svg', aliases:[]},
-  {lcn:541, name:'France 24 Français',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/France_24.svg', aliases:['france 24 français','france 24 francais']},
-  {lcn:543, name:'Deutsche Welle',   logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/DW.svg', aliases:['deutsche welle','dw']},
-  {lcn:550, name:'San Marino RTV',   logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/San_Marino_RTV.svg', aliases:['san marino rtv']},
-  {lcn:552, name:'TVP Polonia',      logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/TVP_Polonia.svg', aliases:['tvp polonia']},
-  {lcn:558, name:'TVR International',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/TVR_International.svg', aliases:['tvr international']},
-  {lcn:560, name:'Al Jazeera Arabic',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Al_Jazeera.svg', aliases:['al jazeera arabic']},
-  {lcn:561, name:'Al Arabiya',       logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Al_Arabiya.svg', aliases:['al arabiya']},
-  {lcn:562, name:'BBC Arabic',       logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/180px-BBC_Arabic.png', aliases:['bbc arabic']},
-  {lcn:563, name:'Sky News Arabia',  logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Sky_News_Arabia.svg', aliases:['sky news arabia']},
-  {lcn:564, name:'TRT World (564)',  logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/TRT_World.svg', aliases:[]},
-  {lcn:567, name:'TRT Arabi',        logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/TRT_Arabi.svg', aliases:['trt arabi']},
-  {lcn:568, name:'Al Masriyah',      logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/100px-Al_Masriyah.png', aliases:['al masriyah']},
-  {lcn:569, name:'Tunis 7',          logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/100px-El_Watania_1.png', aliases:['tunis 7']},
-  {lcn:601, name:'DeA Kids',         logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/DeA_Kids.svg', aliases:['dea kids']},
-  {lcn:602, name:'Nick Jr.',         logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Nick_Jr._Outline.svg', aliases:['nick jr','nick jr.','nickjr']},
-  {lcn:603, name:'Nickelodeon',      logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Nickelodeon.svg', aliases:['nickelodeon']},
-  {lcn:604, name:'Disney Jr.',       logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Disney_Jr.svg', aliases:['disney jr','disney jr.','disney junior']},
-  {lcn:605, name:'DeA Junior',       logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/180px-DeA_Junior.png', aliases:['dea junior']},
-  {lcn:606, name:'Cartoon Network',  logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Cartoon_Network.svg', aliases:['cartoon network','cartoonnetwork']},
-  {lcn:607, name:'Boomerang',        logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Boomerang.svg', aliases:['boomerang']},
-  {lcn:714, name:'Deejay TV',        logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/120px-Logo_DeeJay.png', aliases:['deejay tv','dj tv']},
-  {lcn:716, name:'Radio Monte Carlo TV',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/60px-RMC_Logo.png', aliases:[]},
-  {lcn:717, name:'Virgin Radio TV',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Virgin_Radio.svg', aliases:[]},
-  {lcn:724, name:'RDS Social TV',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/RDS_Social_TV.svg', aliases:[]},
-  {lcn:725, name:'Radio Italia TV',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Radio_Italia_TV.svg', aliases:[]},
-  {lcn:726, name:'Radio Italia Live TV',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Radio_Italia_TV.svg', aliases:[]},
-  {lcn:727, name:'Radio Kiss Kiss TV',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/100px-Radio_Kiss_Kiss.png', aliases:[]},
-  {lcn:730, name:'Radionorba TV',    logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/160px-Radio_Norba_TV.png', aliases:['radionorba tv','radionorba']},
-  {lcn:735, name:'Radio Zeta TV',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/Radio_Zeta.svg', aliases:[]},
-  {lcn:736, name:'RTL 102.5 TV',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/RTL_102.5.svg', aliases:[]},
-  {lcn:737, name:'RTL 102.5 Caliente',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/RTL_102.5.svg', aliases:[]},
-  {lcn:738, name:'Radio Freccia TV',logo:'https://raw.githubusercontent.com/xer94x/tv/main/loghi/160px-Radio_Freccia.png', aliases:[]}
-];
+(function(){
+  "use strict";
 
-// Build lookup maps from LOCAL_CHANNELS
-const LOCAL_BY_LCN={};
-const LOCAL_BY_ALIAS={};
-for(const ch of LOCAL_CHANNELS){
-  LOCAL_BY_LCN[ch.lcn]=ch;
-  LOCAL_BY_ALIAS[ch.name.toLowerCase()]=ch;
-  for(const a of ch.aliases) LOCAL_BY_ALIAS[a.toLowerCase()]=ch;
-}
+  const els = {
+    video: document.getElementById('video'),
+    placeholder: document.getElementById('placeholder'),
+    overlay: document.getElementById('overlayMsg'),
+    groups: document.getElementById('groups'),
+    search: document.getElementById('search'),
+    m3uUrl: document.getElementById('m3uUrl'),
+    loadUrlBtn: document.getElementById('loadUrlBtn'),
+    m3uFile: document.getElementById('m3uFile'),
+    playlistHint: document.getElementById('playlistHint'),
+    nowPlaying: document.getElementById('nowPlaying'),
+    liveTag: document.getElementById('liveTag'),
+    statusPill: document.getElementById('statusPill'),
+    sidebar: document.getElementById('sidebar'),
+    menuBtn: document.getElementById('menuBtn'),
+  };
 
-function lookupLocal(name){
-  if(!name) return null;
-  const k=name.toLowerCase().replace(/\s+/g,' ').trim();
-  if(LOCAL_BY_ALIAS[k]) return LOCAL_BY_ALIAS[k];
-  const stripped=k.replace(/\s+(hd\+1|\+1\s*hd|full\s*hd|fhd|h\.?265|uhd|4k|\+1|\+2|hd|sd|ita|italy|italia|it)\s*$/i,'').trim();
-  if(stripped!==k&&LOCAL_BY_ALIAS[stripped]) return LOCAL_BY_ALIAS[stripped];
-  // prefix match
-  for(const [key,ch] of Object.entries(LOCAL_BY_ALIAS)){
-    if(k.startsWith(key+' ')||stripped.startsWith(key+' ')) return ch;
-  }
-  return null;
-}
+  let channels = [];        // { name, url, logo, group, tvgId }
+  let activeChannel = null;
+  let hls = null;
+  let openGroup = null;   // nome del gruppo attualmente espanso (solo uno alla volta)
 
-function lookupLogo(name){
-  const ch=lookupLocal(name);
-  return ch?ch.logo:null;
-}
+  // ── Parsing M3U (stessa logica dell'app Python: EXTINF + attributi) ──
+  function parseM3U(content){
+    const lines = content.split(/\r?\n/);
+    const result = [];
+    let pending = null;
 
-function getLCN(name){
-  if(!name) return 9999;
-  const ch=lookupLocal(name);
-  if(ch) return ch.lcn;
-  return 9999;
-}
+    for (let raw of lines){
+      const line = raw.trim();
+      if (!line) continue;
 
-// ═══════════════════════════════════════════════════
-// DEDUPLICATION — strip quality/variant suffixes
-// ═══════════════════════════════════════════════════
-function canonName(raw){
-  return (raw||'')
-    .replace(/\s+(HD\+1|\+1\s*HD|FULL\s*HD|FHD|H\.?265|UHD|4K|HD\+|SD|HD|\+1|\+2)\s*$/i,'')
-    .replace(/\s+(ITA|ITALY|ITALIA|IT)\s*$/i,'')
-    .replace(/\s+FAST\+?\s*$/i,'')
-    .replace(/\s*\([^)]*\)\s*$/,'')
-    .replace(/\s+/g,' ').trim();
-}
-// Prefer: HD > plain > FHD > SD > +1
-function variantScore(raw){
-  const r=(raw||'').toUpperCase();
-  if(/HD\+1|\+1\s*HD/.test(r)) return 10;
-  if(/\+1|\+2/.test(r)) return 9;
-  if(/\bSD\b/.test(r)) return 8;
-  if(/H\.?265/.test(r)) return 7;
-  if(/\bFULL\s*HD\b|\bFHD\b/.test(r)) return 3;
-  if(/\bUHD\b|\b4K\b/.test(r)) return 4;
-  if(/\bHD\b/.test(r)) return 1;
-  return 5;
-}
-
-// ═══════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════
-let channels=[], programmes={}, activeChannel=null, activeDate=null, allDates=[], filterGroup='all';
-
-// ═══════════════════════════════════════════════════
-// CLOCK
-// ═══════════════════════════════════════════════════
-function tick(){ document.getElementById('clock').textContent=new Date().toLocaleTimeString('it-IT'); }
-setInterval(tick,1000); tick();
-function setStatus(s,t){ document.getElementById('sdot').className='status-dot '+s; document.getElementById('stxt').textContent=t; }
-
-// ═══════════════════════════════════════════════════
-// CACHE
-// ═══════════════════════════════════════════════════
-async function hardRefresh(){ init(); }
-
-// ═══════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════
-function showLocalChannels(){
-  channels=LOCAL_CHANNELS.map(lc=>({id:'local_'+lc.lcn,name:lc.name,logo:lc.logo,lcn:lc.lcn}));
-  channels.sort((a,b)=>a.lcn-b.lcn);
-  programmes={};
-  renderChannels();
-}
-
-// ═══════════════════════════════════════════════════
-// EPG LOCALE — carica epg-it.xml.gz e decomprime nel browser
-// (aggiornato automaticamente da GitHub Actions)
-// ═══════════════════════════════════════════════════
-// Decomprime un ArrayBuffer gzip e restituisce la stringa XML
-async function decompressGzip(buf){
-  const ds=new DecompressionStream('gzip');
-  const w=ds.writable.getWriter();
-  const reader=ds.readable.getReader();
-  w.write(new Uint8Array(buf)); w.close();
-  const chunks=[];
-  while(true){const{done,value}=await reader.read();if(done)break;chunks.push(value);}
-  const total=chunks.reduce((n,c)=>n+c.length,0);
-  const out=new Uint8Array(total); let off=0;
-  for(const c of chunks){out.set(c,off);off+=c.length;}
-  return new TextDecoder().decode(out);
-}
-
-// Carica un singolo file EPG (gzip o xml) e restituisce il testo XML
-async function fetchOneEPG(filename){
-  try{
-    const bust=Date.now();
-    const r=await fetch(filename+'?v='+bust,{cache:'no-store',signal:AbortSignal.timeout(30000)});
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const buf=await r.arrayBuffer();
-    try{
-      const xml=await decompressGzip(buf);
-      if(xml.includes('<tv')) return xml;
-    }catch(_){}
-    const xml=new TextDecoder().decode(buf);
-    if(xml.includes('<tv')) return xml;
-    return null;
-  }catch(e){
-    console.warn('[EPG] Impossibile caricare '+filename+':',e.message);
-    return null;
-  }
-}
-
-// Estrae tutti gli ID canale presenti in un documento XMLTV
-function extractChannelIds(xml){
-  const ids=new Set();
-  const re=/<channel\s+id="([^"]+)"/g;
-  let m;
-  while((m=re.exec(xml))!==null) ids.add(m[1].toLowerCase());
-  return ids;
-}
-
-// Fusione con priorità:
-// - xml1 (primario) viene usato integralmente
-// - xml2 (secondario) contribuisce SOLO con canali e programmi
-//   i cui channel-id NON sono già presenti nel primario
-function mergeXMLTVPriority(xmlPrimary, xmlSecondary){
-  if(!xmlSecondary) return xmlPrimary;
-  if(!xmlPrimary)   return xmlSecondary;
-
-  // Costruisce l'insieme dei nomi canonici già coperti dalla fonte primaria
-  // (le due sorgenti usano channel-id diversi per gli stessi canali, es. Rai1.it vs Rai1.sky.it)
-  const parser = new DOMParser();
-  const doc1 = parser.parseFromString(xmlPrimary, 'text/xml');
-  const doc2 = parser.parseFromString(xmlSecondary, 'text/xml');
-  if(doc2.querySelector('parsererror')){
-    console.warn('[EPG] Fonte secondaria: XML non valido, ignorata');
-    return xmlPrimary;
-  }
-
-  // Nomi canonici già presenti nella fonte primaria
-  const coveredCanons = new Set();
-  doc1.querySelectorAll('channel').forEach(el => {
-    const d = el.querySelector('display-name');
-    if(d) coveredCanons.add(canonName(d.textContent.trim()).toLowerCase());
-  });
-
-  // Prende dalla secondaria SOLO i canali il cui nome canonico non è già coperto
-  const newChannels = [...doc2.querySelectorAll('channel')]
-    .filter(el => {
-      const d = el.querySelector('display-name');
-      if(!d) return false;
-      return !coveredCanons.has(canonName(d.textContent.trim()).toLowerCase());
-    });
-
-  const newCoveredIds = new Set(newChannels.map(el => el.getAttribute('id').toLowerCase()));
-  const newProgrammes = [...doc2.querySelectorAll('programme')]
-    .filter(el => newCoveredIds.has((el.getAttribute('channel')||'').toLowerCase()));
-
-  if(newChannels.length===0){
-    console.log('[EPG] Fonte secondaria: nessun canale aggiuntivo da integrare');
-    return xmlPrimary;
-  }
-
-  console.log(`[EPG] Fonte secondaria: +${newChannels.length} canali integrati (${newProgrammes.length} programmi)`);
-
-  const s = new XMLSerializer();
-  const extra = [...newChannels, ...newProgrammes]
-    .map(el => s.serializeToString(el)).join('\n');
-
-  return xmlPrimary.replace(/<\/tv>[\s\S]*$/, extra + '\n</tv>');
-}
-
-async function fetchEPGLocal(){
-  setStatus('loading','Caricamento EPG...');
-  // Carica entrambe le fonti in parallelo
-  const [xmlPrimary, xmlSecondary] = await Promise.all([
-    fetchOneEPG('epg-it2.xml.gz'),   // iptv-epg.org  → fonte primaria
-    fetchOneEPG('epg-it.xml.gz'),    // epgitalia.tv  → supplementare
-  ]);
-  if(!xmlPrimary && !xmlSecondary){ return null; }
-  if(!xmlPrimary){
-    console.warn('[EPG] Fonte primaria non disponibile, uso solo secondaria');
-    return xmlSecondary;
-  }
-  if(!xmlSecondary){
-    console.log('[EPG] Solo fonte primaria disponibile');
-    return xmlPrimary;
-  }
-  setStatus('loading','Integrazione canali mancanti...');
-  return mergeXMLTVPriority(xmlPrimary, xmlSecondary);
-}
-
-// ═══════════════════════════════════════════════════
-// XMLTV PARSER WITH DEDUPLICATION
-// ═══════════════════════════════════════════════════
-// Converte offset "+0100"/"-0500" in minuti
-function tzOffsetMinutes(tz){
-  if(!tz||(tz[0]!=='+'&&tz[0]!=='-')) return null;
-  const sign=tz[0]==='-'?-1:1;
-  const hh=parseInt(tz.slice(1,3),10)||0;
-  const mm=parseInt(tz.slice(3,5)||'0',10)||0;
-  return sign*(hh*60+mm);
-}
-
-// Offset corrente di Europe/Rome in minuti (gestisce ora legale automaticamente)
-function romeOffsetMinutes(localDateStr){
-  // Crea una data nel fuso Roma usando Intl per trovare l'offset reale
-  try{
-    const dt=new Date(localDateStr+'Z'); // tratta come UTC temporaneamente
-    const fmt=new Intl.DateTimeFormat('en-US',{timeZone:'Europe/Rome',hour:'numeric',hour12:false,timeZoneName:'short'});
-    // Differenza tra ora UTC e ora Roma = offset
-    const romeStr=new Intl.DateTimeFormat('en-US',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(dt);
-    const utcStr=new Intl.DateTimeFormat('en-US',{timeZone:'UTC',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(dt);
-    const romeMs=new Date(romeStr).getTime();
-    const utcMs=new Date(utcStr).getTime();
-    return Math.round((romeMs-utcMs)/60000);
-  }catch(e){
-    // Fallback: CET=+60, CEST=+120. Ora legale: ultima dom marzo → ultima dom ottobre
-    const d=new Date(localDateStr+'Z');
-    const y=d.getUTCFullYear();
-    // Ultima domenica di marzo
-    const dstStart=new Date(Date.UTC(y,2,31));dstStart.setUTCDate(31-((dstStart.getUTCDay()+0)%7));
-    // Ultima domenica di ottobre
-    const dstEnd=new Date(Date.UTC(y,9,31));dstEnd.setUTCDate(31-((dstEnd.getUTCDay()+0)%7));
-    return (d>=dstStart&&d<dstEnd)?120:60;
-  }
-}
-
-function parseDate(s){
-  const parts=s.trim().split(/\s+/);
-  const m=parts[0];
-  const tz=parts[1]||'';
-  const iso=`${m.slice(0,4)}-${m.slice(4,6)}-${m.slice(6,8)}T${m.slice(8,10)||'00'}:${m.slice(10,12)||'00'}:${m.slice(12,14)||'00'}`;
-
-  if(tz&&(tz[0]==='+'||tz[0]==='-')){
-    // Rispetta sempre la timezone dichiarata nel file EPG (incluso +0000 = UTC reale)
-    const sign=tz[0],hh=tz.slice(1,3),mm2=tz.slice(3,5)||'00';
-    return new Date(`${iso}${sign}${hh}:${mm2}`);
-  }
-
-  // Nessuna timezone dichiarata → assume ora italiana (Europe/Rome)
-  // Determina se è ora legale (CEST=+02:00) o solare (CET=+01:00)
-  const probe=new Date(iso+'Z');
-  const y=probe.getUTCFullYear();
-  const lastSunMarch=new Date(Date.UTC(y,2,31));
-  lastSunMarch.setUTCDate(31-(lastSunMarch.getUTCDay()%7));
-  const lastSunOct=new Date(Date.UTC(y,9,31));
-  lastSunOct.setUTCDate(31-(lastSunOct.getUTCDay()%7));
-  const isCEST=(probe>=lastSunMarch&&probe<lastSunOct);
-  return new Date(`${iso}${isCEST?'+02:00':'+01:00'}`);
-}
-
-function parseXMLTV(xml){
-  const doc=new DOMParser().parseFromString(xml,'text/xml');
-  if(doc.querySelector('parsererror')) throw new Error('XML parse error');
-
-  // Pass 1: collect raw channels
-  const raw=[];
-  doc.querySelectorAll('channel').forEach(el=>{
-    const id=el.getAttribute('id');
-    const d=el.querySelector('display-name');
-    const ic=el.querySelector('icon');
-    if(!id||!d) return;
-    raw.push({id,rawName:d.textContent.trim(),logo:(ic?ic.getAttribute('src'):'')||''});
-  });
-
-  // Pass 2: deduplicate — group by canonical name, keep best variant
-  const canonMap={};   // canon → {id, rawName, logo, score, allIds[]}
-  const idToCanon={};  // any id → canon key
-
-  for(const ch of raw){
-    const canon=canonName(ch.rawName);
-    const score=variantScore(ch.rawName);
-    if(!canonMap[canon]){
-      canonMap[canon]={id:ch.id,rawName:ch.rawName,logo:ch.logo,score,allIds:[ch.id]};
-    } else {
-      canonMap[canon].allIds.push(ch.id);
-      if(score<canonMap[canon].score){
-        canonMap[canon].id=ch.id;
-        canonMap[canon].rawName=ch.rawName;
-        canonMap[canon].logo=ch.logo;
-        canonMap[canon].score=score;
-      }
-    }
-  }
-  for(const [canon,entry] of Object.entries(canonMap)){
-    for(const id of entry.allIds) idToCanon[id]=canon;
-  }
-
-  // Pass 3: programmes — merge all variants
-  const progMap={};  // canon → Map<timeKey, prog>
-  doc.querySelectorAll('programme').forEach(el=>{
-    const chId=el.getAttribute('channel');
-    const startRaw=el.getAttribute('start');
-    if(!chId||!startRaw) return;
-    const canon=idToCanon[chId];
-    if(!canon) return;
-    let start,stop;
-    try{start=parseDate(startRaw);}catch(e){return;}
-    try{stop=el.getAttribute('stop')?parseDate(el.getAttribute('stop')):null;}catch(e){stop=null;}
-    const title=(el.querySelector('title')||{}).textContent?.trim()||'—';
-    const desc=(el.querySelector('desc')||{}).textContent?.trim()||'';
-    const cat=(el.querySelector('category')||{}).textContent?.trim()||'';
-    const tk=Math.round(start.getTime()/60000).toString(); // arrotonda al minuto per tollerare offset tz
-    if(!progMap[canon]) progMap[canon]=new Map();
-    if(!progMap[canon].has(tk)) progMap[canon].set(tk,{start,stop,title,desc,category:cat});
-  });
-
-  // Pass 4: build channel list, then deduplicate by final display name
-  // (EPG may have Rai1.it / Rai1.sky.it / Rai1.tivusat.it → all become "Rai 1")
-  const rawList=Object.entries(canonMap).map(([canon,entry])=>{
-    const local=lookupLocal(canon);
-    return {
-      id:canon,
-      name:local?local.name:canon,
-      logo:local?local.logo:(entry.logo||''),
-      lcn:local?local.lcn:getLCN(canon),
-    };
-  });
-
-  // Merge by final name: keep entry with best (lowest) lcn, merge programme IDs
-  const nameMap={};   // final name (lower) → best entry
-  const nameToCanons={}; // final name (lower) → [canon ids]
-  for(const ch of rawList){
-    const k=ch.name.toLowerCase();
-    if(!nameMap[k]){
-      nameMap[k]=ch;
-      nameToCanons[k]=[ch.id];
-    } else {
-      nameToCanons[k].push(ch.id);
-      // keep lower lcn
-      if(ch.lcn<nameMap[k].lcn) nameMap[k]={...ch};
-    }
-  }
-
-  // Re-map programme IDs to the winning canon for each merged group
-  for(const [nameKey,canons] of Object.entries(nameToCanons)){
-    if(canons.length<=1) continue;
-    const winId=nameMap[nameKey].id;
-    if(!progMap[winId]) progMap[winId]=new Map();
-    for(const cid of canons){
-      if(cid===winId) continue;
-      if(progMap[cid]) for(const [tk,p] of progMap[cid]) if(!progMap[winId].has(tk)) progMap[winId].set(tk,p);
-    }
-  }
-
-  const programmes={};
-  for(const [nameKey,ch] of Object.entries(nameMap)){
-    const map=progMap[ch.id];
-    if(map){
-      const sorted=[...map.values()].sort((a,b)=>a.start-b.start);
-      const deduped=[];
-      const lastKept={};
-      for(const p of sorted){
-        const dayKey=ldk(p.start);
-        const titleNorm=p.title.toLowerCase().replace(/\s+/g,' ').trim().replace(/[^a-z0-9àèéìíîòóùú]/g,'');
-        const k=dayKey+'|'+titleNorm;
-        const t=p.start.getTime();
-        if(lastKept[k]===undefined||t-lastKept[k]>120*60000){
-          lastKept[k]=t;
-          deduped.push(p);
+      if (line.startsWith('#EXTINF')){
+        const info = line.substring(line.indexOf(':') + 1);
+        const logoMatch  = info.match(/tvg-logo="([^"]*)"/i);
+        const groupMatch = info.match(/group-title="([^"]*)"/i);
+        const idMatch    = info.match(/tvg-id="([^"]*)"/i);
+        const nameMatch  = info.match(/,(.*)$/);
+        pending = {
+          name: nameMatch ? nameMatch[1].trim() : 'Canale',
+          logo: logoMatch ? logoMatch[1] : '',
+          group: groupMatch ? groupMatch[1] : 'Senza categoria',
+          tvgId: idMatch ? idMatch[1] : '',
+        };
+      } else if (line.startsWith('#')){
+        continue; // altre direttive (#EXTM3U, #EXTVLCOPT, ecc.) ignorate
+      } else {
+        // riga URL
+        if (pending){
+          pending.url = line;
+          result.push(pending);
+          pending = null;
         }
       }
-      programmes[ch.id]=deduped;
+    }
+    return result;
+  }
+
+  function groupChannels(list){
+    const map = new Map();
+    for (const ch of list){
+      if (!map.has(ch.group)) map.set(ch.group, []);
+      map.get(ch.group).push(ch);
+    }
+    return map;
+  }
+
+  function renderChannels(filterText){
+    const filter = (filterText || '').trim().toLowerCase();
+    const filtered = filter
+      ? channels.filter(c => c.name.toLowerCase().includes(filter))
+      : channels;
+
+    if (!filtered.length){
+      els.groups.innerHTML = `<div class="empty-state">${channels.length ? 'Nessun canale trovato.' : 'Carica una playlist M3U (URL o file)<br>per vedere i canali qui.'}</div>`;
+      return;
+    }
+
+    const grouped = groupChannels(filtered);
+    const frag = document.createDocumentFragment();
+
+    for (const [groupName, chans] of grouped){
+      const isOpen = filter ? true : openGroup === groupName;
+      const groupEl = document.createElement('div');
+      groupEl.className = 'group' + (isOpen ? ' open' : '');
+
+      const head = document.createElement('div');
+      head.className = 'group-head';
+      head.innerHTML = `<span><span class="chevron">▶</span> ${escapeHtml(groupName)}</span><span class="count">${chans.length}</span>`;
+      head.addEventListener('click', () => {
+        if (filter) return; // durante la ricerca i gruppi restano tutti aperti
+        openGroup = (openGroup === groupName) ? null : groupName;
+        renderChannels(els.search.value);
+      });
+
+      const body = document.createElement('div');
+      body.className = 'group-body';
+
+      for (const ch of chans){
+        const item = document.createElement('div');
+        item.className = 'channel' + (activeChannel === ch ? ' active' : '');
+        item.innerHTML = `
+          <img class="ch-logo" src="${escapeAttr(ch.logo)}" alt=""
+               onerror="this.style.visibility='hidden'">
+          <span class="ch-name">${escapeHtml(ch.name)}</span>`;
+        item.addEventListener('click', () => playChannel(ch));
+        body.appendChild(item);
+      }
+
+      groupEl.appendChild(head);
+      groupEl.appendChild(body);
+      frag.appendChild(groupEl);
+    }
+
+    els.groups.innerHTML = '';
+    els.groups.appendChild(frag);
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+  function escapeAttr(s){ return escapeHtml(s || ''); }
+
+  // ── Proxy CORS automatici (nessuna configurazione richiesta) ──────
+  // Provati in ordine solo se il fetch diretto fallisce per CORS/rete.
+  const CORS_PROXIES = [
+    u => 'https://corsproxy.io/?url=' + encodeURIComponent(u),
+    u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
+    u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u),
+  ];
+
+  // Prova l'URL diretto, poi i proxy in cascata. Restituisce { text, viaProxy }.
+  async function fetchWithFallback(url, onStatus){
+    try{
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return { text: await res.text(), viaProxy: false };
+    }catch(directErr){
+      for (let i = 0; i < CORS_PROXIES.length; i++){
+        if (onStatus) onStatus(`Fetch diretto fallito, provo proxy ${i + 1}/${CORS_PROXIES.length}…`);
+        try{
+          const res = await fetch(CORS_PROXIES[i](url), { cache: 'no-store' });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const text = await res.text();
+          if (!text || !text.trim()) throw new Error('risposta vuota');
+          return { text, viaProxy: true };
+        }catch(e){ /* prova il prossimo proxy */ }
+      }
+      throw directErr;
     }
   }
 
-  const chList=Object.values(nameMap);
-  return{channels:chList,programmes};
-}
-
-// ═══════════════════════════════════════════════════
-// GROUPS
-// ═══════════════════════════════════════════════════
-const GROUP_RULES=[
-  {g:'RAI',kw:['rai ','rai1','rai2','rai3','rai4','rai5']},
-  {g:'Mediaset',kw:['canale 5','italia 1','rete 4','cine 34','iris','la 5','mediaset','top crime','boing','cartoonito','focus','twentyseven']},
-  {g:'Sky',kw:['sky ','cielo','eurosport','dazn']},
-  {g:'Sport',kw:['sport','calcio','tennis','motor','gol','juventus','inter tv','milan tv','basket','supertennis','sportitalia']},
-  {g:'News',kw:['news','tg ','tg24','notizie','euronews','france 24','bloomberg','sky news']},
-  {g:'Kids',kw:['yoyo','gulp','cartoon','junior','kids','boing','baby','manga','super!','k2','frisbee']},
-  {g:'Musica',kw:['music','radio ','deejay','rtl','m2o','vevo','rock tv','mtv','trace']},
-  {g:'Discovery',kw:['discovery','dmax','real time','food network','hgtv','giallo','motor trend','motortrend']},
-];
-function getGroup(name){
-  const n=name.toLowerCase();
-  for(const{g,kw}of GROUP_RULES){if(kw.some(k=>n.includes(k)))return g;}
-  return 'Altro';
-}
-
-// ═══════════════════════════════════════════════════
-// UTILITY: get current program (the one started most recently among overlapping)
-// ═══════════════════════════════════════════════════
-function getCurrentProgram(programs, now) {
-  if (!programs || programs.length === 0) return null;
-  const todayStr = todayKey();
-  const overlapping = programs.filter(p =>
-    ldk(p.start) === todayStr && p.start <= now && p.stop && p.stop > now
-  );
-  if (overlapping.length === 0) return null;
-  return overlapping.reduce((latest, p) => p.start > latest.start ? p : latest, overlapping[0]);
-}
-
-// ═══════════════════════════════════════════════════
-// RENDER CHANNELS
-// ═══════════════════════════════════════════════════
-function renderChannels(){
-  const q=document.getElementById('search').value.toLowerCase().trim();
-  const list=document.getElementById('chList');
-  list.innerHTML='';
-  const now=new Date();
-  let shown=0;
-  for(const ch of channels){
-    if(ch.lcn>=9999) continue; // nasconde canali senza numero
-    if(filterGroup!=='all'&&getGroup(ch.name)!==filterGroup) continue;
-    if(q&&!ch.name.toLowerCase().includes(q)) continue;
-    shown++;
-    const progs=programmes[ch.id]||[];
-    const current = getCurrentProgram(progs, now);
-    const todayProgs = progs.filter(p => ldk(p.start) === todayKey());
-    const nowP = current || todayProgs.find(p => p.start > now);
-    let pct=0;
-    if(current && current.stop && current.start<=now && current.stop>now)
-      pct=Math.min(100,((now-current.start)/(current.stop-current.start))*100);
-    const ini=ch.name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'TV';
-    const item=document.createElement('div');
-    item.className='ch-item'+(activeChannel&&activeChannel.id===ch.id?' active':'');
-    item.innerHTML=`
-      <div class="ch-num">${ch.lcn<9999?ch.lcn:''}</div>
-      <div class="ch-logo-wrap">
-        ${ch.logo
-          ?`<img class="ch-logo" src="${esc(ch.logo)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='block'"><div class="ch-logo-ph" style="display:none">${ini}</div>`
-          :`<div class="ch-logo-ph">${ini}</div>`}
-      </div>
-      <div class="ch-info">
-        <div class="ch-name">${esc(ch.name)}</div>
-        <div class="ch-now">${nowP?`<span class="ch-now-title">${esc(nowP.title)}</span>`:'<span>—</span>'}</div>
-      </div>
-      ${pct>0?`<div class="ch-prog-bar" style="width:${pct.toFixed(1)}%"></div>`:''}`;
-    item.addEventListener('click',()=>selectChannel(ch,item));
-    list.appendChild(item);
-  }
-  if(!shown) list.innerHTML=`<div style="padding:40px;text-align:center;color:var(--muted2);font-size:12px">Nessun canale trovato</div>`;
-}
-function filterChannels(){renderChannels();}
-
-function buildFilters(){
-  // filtri rimossi dall'interfaccia, funzione mantenuta per compatibilità
-  filterGroup='all';
-  renderChannels();
-}
-function setFilter(g,btn){
-  filterGroup=g;
-  document.querySelectorAll('.filt-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderChannels();
-}
-
-// ═══════════════════════════════════════════════════
-// SELECT CHANNEL
-// ═══════════════════════════════════════════════════
-function selectChannel(ch,itemEl){
-  activeChannel=ch;
-  document.querySelectorAll('.ch-item').forEach(e=>e.classList.remove('active'));
-  if(itemEl) itemEl.classList.add('active');
-  document.getElementById('epgHeader').style.display='block';
-  const logo=document.getElementById('epgLogo');
-  const ph=document.getElementById('epgLogoPh');
-  const ini=ch.name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'TV';
-  ph.textContent=ini;
-  if(ch.logo){logo.src=ch.logo;logo.style.display='';ph.style.display='none';}
-  else{logo.style.display='none';ph.style.display='';}
-  document.getElementById('epgChName').textContent=ch.name;
-  const progs=programmes[ch.id]||[];
-  allDates=buildDates(progs);
-  const today=todayKey();
-  if(allDates.includes(today)){activeDate=today;}
-  else{activeDate=allDates.reduce((best,d)=>Math.abs(new Date(d)-new Date(today))<Math.abs(new Date(best)-new Date(today))?d:best,allDates[0]||today);}
-  renderDateTabs(); renderSchedule();
-}
-
-// ═══════════════════════════════════════════════════
-// DATES
-// ═══════════════════════════════════════════════════
-function buildDates(progs){const s=new Set();for(const p of progs)s.add(ldk(p.start));return[...s].sort();}
-function ldk(d){return d.toLocaleDateString('sv-SE');}
-function todayKey(){return new Date().toLocaleDateString('sv-SE');}
-function fmtDate(key){
-  const[y,m,d]=key.split('-').map(Number);
-  const dt=new Date(y,m-1,d);
-  const td=new Date();td.setHours(0,0,0,0);
-  const diff=Math.round((dt-td)/86400000);
-  const nm={'-1':'Ieri','0':'Oggi','1':'Domani'};
-  if(nm[diff]!==undefined)return nm[diff];
-  return dt.toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'});
-}
-function renderDateTabs(){
-  const el=document.getElementById('dateTabs');el.innerHTML='';
-  if(!allDates.length){el.innerHTML='<span style="font-size:10px;color:var(--muted2)">Nessuna data</span>';return;}
-  for(const d of allDates){
-    const btn=document.createElement('button');
-    btn.className='date-tab'+(d===activeDate?' active':'');
-    btn.textContent=fmtDate(d);
-    btn.onclick=()=>{activeDate=d;renderDateTabs();renderSchedule();};
-    el.appendChild(btn);
-  }
-}
-
-// ═══════════════════════════════════════════════════
-// RENDER SCHEDULE
-// ═══════════════════════════════════════════════════
-function renderSchedule(){
-  const el=document.getElementById('epgList');
-  if(!activeChannel){el.innerHTML='';return;}
-  const now=new Date();
-  const progs=(programmes[activeChannel.id]||[]).filter(p=>ldk(p.start)===activeDate);
-  document.getElementById('epgChSub').textContent=`${progs.length} programmi · ${fmtDate(activeDate)}`;
-  if(!progs.length){
-    el.innerHTML=`<div class="center-msg"><div class="icon">📋</div><div class="sub">Nessun programma per questa data</div></div>`;
-    return;
-  }
-  // determina il programma corrente (se presente) usando la funzione helper
-  const currentProgram = getCurrentProgram(progs, now);
-  el.innerHTML='';let scrollTo=null;
-  for(const p of progs){
-    const isNow = (currentProgram === p);
-    const isPast = p.stop && p.stop <= now;
-    const item=document.createElement('div');
-    item.className='prog-item'+(isNow?' now':'')+(isPast?' past':'');
-    const ss=p.start.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-    const es=p.stop?p.stop.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}):'';
-    const dur=p.stop?Math.round((p.stop-p.start)/60000):0;
-    let pct=0;if(isNow&&p.stop)pct=Math.min(100,((now-p.start)/(p.stop-p.start))*100);
-    item.innerHTML=`
-      <div class="prog-time">${ss}${es?`<br><span style="font-size:9px;opacity:.4">${es}</span>`:''}</div>
-      <div class="prog-body">
-        <div class="prog-title">${esc(p.title)}</div>
-        ${p.desc?`<div class="prog-desc">${esc(p.desc)}</div>`:''}
-        <div class="prog-meta">
-          ${isNow?'<span class="prog-tag live">● IN ONDA</span>':''}
-          ${p.category?`<span class="prog-tag">${esc(p.category)}</span>`:''}
-        </div>
-        ${isNow&&pct>0?`<div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${pct.toFixed(1)}%"></div></div>`:''}
-      </div>
-      ${dur>0?`<div class="prog-dur">${dur}m</div>`:''}`;
-    el.appendChild(item);
-    if(isNow)scrollTo=item;
-  }
-  if(scrollTo)setTimeout(()=>scrollTo.scrollIntoView({behavior:'smooth',block:'center'}),80);
-}
-
-// ═══════════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════════
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function showSkeleton(){const el=document.getElementById('chList');el.innerHTML='';for(let i=0;i<22;i++){const d=document.createElement('div');d.className='skel-ch';el.appendChild(d);}}
-
-// ═══════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════
-function showLocalChannels(){
-  // Mostra subito tutti i canali LOCAL_CHANNELS mentre EPG carica
-  channels=LOCAL_CHANNELS.map(lc=>({id:'local_'+lc.lcn,name:lc.name,logo:lc.logo,lcn:lc.lcn}));
-  channels.sort((a,b)=>a.lcn-b.lcn);
-  programmes={};
-  renderChannels();
-}
-
-function mergeEPGIntoChannels(parsed){
-  // Aggiorna i canali esistenti con dati EPG, aggiunge nuovi se non presenti
-  const existingNames=new Set(parsed.channels.map(c=>c.name.toLowerCase()));
-  for(const lc of LOCAL_CHANNELS){
-    if(!existingNames.has(lc.name.toLowerCase())){
-      parsed.channels.push({id:'local_'+lc.lcn,name:lc.name,logo:lc.logo,lcn:lc.lcn});
+  // ── Caricamento playlist ─────────────────────────────────────────
+  async function loadFromUrl(url){
+    setHint('Caricamento playlist…');
+    try{
+      const { text } = await fetchWithFallback(url, setHint);
+      applyPlaylist(text, url);
+    }catch(err){
+      setHint('Errore caricamento: ' + err.message);
     }
   }
-  parsed.channels.sort((a,b)=>{
-    if(a.lcn<9999&&b.lcn<9999)return a.lcn-b.lcn;
-    if(a.lcn<9999)return-1;if(b.lcn<9999)return 1;
-    return a.name.localeCompare(b.name,'it');
+
+  function loadFromFile(file){
+    setHint('Lettura file…');
+    const reader = new FileReader();
+    reader.onload = () => applyPlaylist(reader.result, file.name);
+    reader.onerror = () => setHint('Errore lettura file.');
+    reader.readAsText(file);
+  }
+
+  function applyPlaylist(text, sourceLabel){
+    const parsed = parseM3U(text);
+    channels = parsed;
+    activeChannel = null;
+    renderChannels(els.search.value);
+    setHint(`${parsed.length} canali · ${sourceLabel}`);
+    try{ localStorage.setItem('iptv_last_source', sourceLabel); }catch(e){}
+  }
+
+  function setHint(msg){ els.playlistHint.textContent = msg; }
+
+  // ── Player HLS con auto-restart (watchdog, come nell'app Python) ──
+  let watchdogTimer = null;
+  let retryCount = 0;
+  const MAX_RETRY = 5;
+
+  function clearWatchdog(){
+    if (watchdogTimer){ clearTimeout(watchdogTimer); watchdogTimer = null; }
+  }
+
+  function playChannel(ch){
+    activeChannel = ch;
+    renderChannels(els.search.value);
+    els.nowPlaying.textContent = ch.name;
+    els.nowPlaying.classList.remove('dim');
+    els.placeholder.style.display = 'none';
+    els.overlay.classList.remove('show');
+    els.statusPill.textContent = 'CONNESSIONE…';
+    els.liveTag.classList.remove('on');
+    retryCount = 0;
+    streamCandidates = [ch.url, ...CORS_PROXIES.map(p => p(ch.url))];
+    candidateIndex = 0;
+    startStream(streamCandidates[0]);
+    if (window.innerWidth <= 760) els.sidebar.classList.remove('open');
+  }
+
+  let streamCandidates = [];
+  let candidateIndex = 0;
+
+  function startStream(url){
+    clearWatchdog();
+    if (hls){ hls.destroy(); hls = null; }
+
+    const viaProxy = candidateIndex > 0;
+
+    // Stesso ordine dell'esempio noto funzionante: prova prima l'HLS nativo
+    // del browser (Safari/iOS), poi hls.js come fallback.
+    if (els.video.canPlayType('application/vnd.apple.mpegurl') && !viaProxy){
+      els.video.src = url;
+      els.video.addEventListener('loadedmetadata', () => {
+        els.video.play().catch(() => {});
+        els.statusPill.textContent = 'IN RIPRODUZIONE';
+        els.liveTag.classList.add('on');
+        retryCount = 0;
+      }, { once:true });
+      els.video.addEventListener('error', () => handleStreamError('Errore riproduzione stream'), { once:true });
+
+    } else if (Hls.isSupported()){
+      hls = new Hls({
+        liveSyncDurationCount: 3,
+        maxBufferLength: 20,
+        manifestLoadingMaxRetry: 4,
+        levelLoadingMaxRetry: 4,
+        fragLoadingMaxRetry: 4,
+      });
+      hls.loadSource(url);
+      hls.attachMedia(els.video);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        els.video.play().catch(() => {});
+      });
+
+      hls.on(Hls.Events.FRAG_BUFFERED, () => {
+        els.statusPill.textContent = 'IN RIPRODUZIONE';
+        els.liveTag.classList.add('on');
+        retryCount = 0;
+      });
+
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        if (!data.fatal) return;
+        if (data.type === Hls.ErrorTypes.MEDIA_ERROR){
+          hls.recoverMediaError();
+          return;
+        }
+        const label = data.type === Hls.ErrorTypes.NETWORK_ERROR
+          ? 'Errore di rete sullo stream' : 'Errore riproduzione stream';
+        handleStreamError(label);
+      });
+
+    } else {
+      showOverlay('Il browser non supporta la riproduzione HLS.');
+    }
+
+    // watchdog: se non arriva nessun frame entro N secondi, riavvia (come nel player Python)
+    watchdogTimer = setTimeout(() => {
+      if (els.statusPill.textContent !== 'IN RIPRODUZIONE'){
+        handleStreamError('Timeout connessione stream');
+      }
+    }, 15000);
+  }
+
+  // Alcuni stream (es. relinker Rai) funzionano col player nativo (Safari)
+  // ma vengono bloccati dal CORS quando hls.js legge il manifest in Chrome/
+  // Edge/Firefox. Al primo errore di rete si prova automaticamente la stessa
+  // URL passata attraverso una cascata di proxy CORS pubblici, senza che tu
+  // debba configurare nulla.
+  function handleStreamError(label){
+    if (candidateIndex < streamCandidates.length - 1){
+      candidateIndex++;
+      els.statusPill.textContent = 'RIPROVO CON PROXY…';
+      startStream(streamCandidates[candidateIndex]);
+      return;
+    }
+    scheduleRestart(label);
+  }
+
+  function scheduleRestart(reason){
+    clearWatchdog();
+    if (!activeChannel) return;
+    retryCount++;
+    if (retryCount > MAX_RETRY){
+      showOverlay(reason + '.\nTentativi esauriti — riprova manualmente o cambia canale.');
+      els.statusPill.textContent = 'ERRORE';
+      return;
+    }
+    showOverlay(`${reason}.\nRiconnessione in corso… (tentativo ${retryCount}/${MAX_RETRY})`);
+    els.statusPill.textContent = 'RICONNESSIONE…';
+    els.liveTag.classList.remove('on');
+    const delay = Math.min(1500 * retryCount, 8000);
+    setTimeout(() => {
+      if (activeChannel){
+        els.overlay.classList.remove('show');
+        candidateIndex = 0;
+        startStream(streamCandidates[0] || activeChannel.url);
+      }
+    }, delay);
+  }
+
+  function showOverlay(msg){
+    els.overlay.textContent = msg;
+    els.overlay.classList.add('show');
+  }
+
+  // ── eventi UI ───────────────────────────────────────────────────
+  els.loadUrlBtn.addEventListener('click', () => {
+    const url = els.m3uUrl.value.trim();
+    if (url) loadFromUrl(url);
   });
-  channels=parsed.channels;
-  programmes=parsed.programmes;
-}
+  els.m3uUrl.addEventListener('keydown', e => {
+    if (e.key === 'Enter') els.loadUrlBtn.click();
+  });
+  els.m3uFile.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) loadFromFile(file);
+  });
+  els.search.addEventListener('input', () => renderChannels(els.search.value));
+  els.menuBtn.addEventListener('click', () => els.sidebar.classList.toggle('open'));
 
-async function init(){
-  setStatus('loading','Caricamento EPG...');
-  showLocalChannels();
+  // ripristina ultimo URL playlist se presente
+  try{
+    const last = localStorage.getItem('iptv_last_source');
+    if (last && /^https?:\/\//i.test(last)){
+      els.m3uUrl.value = last;
+    }
+  }catch(e){}
 
-  const xmlText=await fetchEPGLocal();
-
-  if(!xmlText||!xmlText.includes('<tv')){
-    setStatus('err','EPG non trovato');
-    document.getElementById('epgList').innerHTML=`<div class="center-msg"><div class="icon">⚠️</div><div class="ttl">EPG non disponibile</div><div class="sub">Il file <strong>epg-it.xml.gz</strong> non è stato trovato nella stessa cartella di questa pagina.<br><br>Assicurati che GitHub Actions abbia scaricato il file.</div><button class="retry-btn" onclick="hardRefresh()">🔄 Riprova</button></div>`;
-    return;
-  }
-
-  setStatus('loading','Elaborazione XML...');
-  await new Promise(r=>setTimeout(r,10));
-  let parsed;
-  try{parsed=parseXMLTV(xmlText);}
-  catch(e){
-    setStatus('err','Errore parsing XML');
-    return;
-  }
-  mergeEPGIntoChannels(parsed);
-  setStatus('ok',`${channels.length} canali`);
-  buildFilters();
-  renderChannels();
-  setTimeout(function refresh(){
-    if(channels.length) renderChannels();
-    if(activeChannel) renderSchedule();
-    setTimeout(refresh,60000);
-  },60000);
-}
-init();
+})();
 </script>
 </body>
 </html>
