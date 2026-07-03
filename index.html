@@ -642,7 +642,7 @@
   function nowProgramText(tvgId){
     if (!tvgId) return '';
     const p = getNowProgram(tvgId);
-    return p ? `▶ ${formatTime(p.start)}–${formatTime(p.stop)} ${p.title}` : '';
+    return p ? `▶ ${p.title}` : '';
   }
 
   function refreshNowPlayingLabels(){
