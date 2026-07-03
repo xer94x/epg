@@ -497,8 +497,16 @@
       head.innerHTML = `<span><span class="chevron">▶</span> ${escapeHtml(groupName)}</span><span class="count">${chans.length}</span>`;
       head.addEventListener('click', () => {
         if (filter) return; // durante la ricerca i gruppi restano tutti aperti
-        openGroup = (openGroup === groupName) ? null : groupName;
+        const wasOpen = openGroup === groupName;
+        openGroup = wasOpen ? null : groupName;
         renderChannels(els.search.value);
+        if (!wasOpen){
+          // porta l'intestazione del gruppo appena aperto in cima alla vista,
+          // altrimenti la chiusura del gruppo precedente sposta il contenuto
+          // e si finisce a metà lista invece che sui primi canali.
+          const openedHead = els.groups.querySelector('.group.open .group-head');
+          if (openedHead) openedHead.scrollIntoView({ block: 'start' });
+        }
       });
 
       const body = document.createElement('div');
