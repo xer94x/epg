@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.15/hls.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 <style>
   :root{
     --bg:        #10141a;
@@ -154,13 +155,34 @@
     flex-shrink:0;
     border:1px solid var(--line);
   }
+  .ch-info{
+    flex:1; min-width:0;
+    display:flex; flex-direction:column; gap:1px;
+  }
   .ch-name{
     font-size:12.5px;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
-    flex:1;
   }
+  .ch-now{
+    font-size:10px;
+    font-family:var(--mono);
+    color:var(--text-dim);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .ch-now:empty{display:none;}
+  .epg-btn{
+    flex-shrink:0;
+    font-size:9.5px;
+    padding:4px 6px;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+  }
+  .epg-btn:hover{border-color:var(--cyan); color:var(--cyan);}
   .empty-state{
     padding:40px 20px;
     text-align:center;
@@ -265,6 +287,48 @@
     .menu-btn{display:inline-flex !important;}
   }
   .menu-btn{display:none;}
+
+  /* ── modale guida programmi (EPG) ───────────────────────────────── */
+  .epg-modal{
+    position:fixed; inset:0; z-index:50;
+    display:none;
+    align-items:center; justify-content:center;
+    background:rgba(6,8,11,.72);
+    padding:20px;
+  }
+  .epg-modal.show{display:flex;}
+  .epg-modal-content{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    width:100%; max-width:460px;
+    max-height:80vh;
+    display:flex; flex-direction:column;
+    overflow:hidden;
+  }
+  .epg-modal-head{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px;
+    padding:12px 16px;
+    border-bottom:1px solid var(--line);
+    font-family:var(--mono);
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--amber);
+  }
+  .epg-modal-head span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .epg-modal-head button{padding:4px 8px; font-size:12px; flex-shrink:0;}
+  .epg-modal-body{overflow-y:auto; flex:1;}
+  .epg-row{
+    display:flex; gap:12px;
+    padding:9px 16px;
+    border-bottom:1px solid var(--line);
+    font-size:12px;
+  }
+  .epg-row.now{background:var(--panel-2);}
+  .epg-row.now .epg-title{color:var(--amber);}
+  .epg-time{font-family:var(--mono); color:var(--text-dim); flex-shrink:0; width:92px;}
+  .epg-title{flex:1;}
 </style>
 </head>
 <body>
@@ -314,6 +378,16 @@
   </main>
 </div>
 
+<div class="epg-modal" id="epgModal">
+  <div class="epg-modal-content">
+    <div class="epg-modal-head">
+      <span id="epgModalTitle">Guida programmi</span>
+      <button id="epgModalClose" type="button">✕</button>
+    </div>
+    <div class="epg-modal-body" id="epgModalBody"></div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -333,12 +407,17 @@
     statusPill: document.getElementById('statusPill'),
     sidebar: document.getElementById('sidebar'),
     menuBtn: document.getElementById('menuBtn'),
+    epgModal: document.getElementById('epgModal'),
+    epgModalTitle: document.getElementById('epgModalTitle'),
+    epgModalBody: document.getElementById('epgModalBody'),
+    epgModalClose: document.getElementById('epgModalClose'),
   };
 
   let channels = [];        // { name, url, logo, group, tvgId }
   let activeChannel = null;
   let hls = null;
   let openGroup = null;   // nome del gruppo attualmente espanso (solo uno alla volta)
+  let epgMap = new Map();   // tvgId -> [{ start:Date, stop:Date, title }]
 
   // ── Parsing M3U (stessa logica dell'app Python: EXTINF + attributi) ──
   function parseM3U(content){
@@ -419,10 +498,44 @@
       for (const ch of chans){
         const item = document.createElement('div');
         item.className = 'channel' + (activeChannel === ch ? ' active' : '');
-        item.innerHTML = `
-          <img class="ch-logo" src="${escapeAttr(ch.logo)}" alt=""
-               onerror="this.style.visibility='hidden'">
-          <span class="ch-name">${escapeHtml(ch.name)}</span>`;
+
+        const logo = document.createElement('img');
+        logo.className = 'ch-logo';
+        logo.src = ch.logo || '';
+        logo.alt = '';
+        logo.addEventListener('error', () => { logo.style.visibility = 'hidden'; });
+
+        const info = document.createElement('div');
+        info.className = 'ch-info';
+
+        const nameEl = document.createElement('span');
+        nameEl.className = 'ch-name';
+        nameEl.textContent = ch.name;
+
+        const nowEl = document.createElement('span');
+        nowEl.className = 'ch-now';
+        nowEl.dataset.tvgid = ch.tvgId || '';
+        nowEl.textContent = nowProgramText(ch.tvgId);
+
+        info.appendChild(nameEl);
+        info.appendChild(nowEl);
+
+        item.appendChild(logo);
+        item.appendChild(info);
+
+        if (ch.tvgId && epgMap.has(ch.tvgId)){
+          const epgBtn = document.createElement('button');
+          epgBtn.type = 'button';
+          epgBtn.className = 'epg-btn';
+          epgBtn.title = 'Guida programmi';
+          epgBtn.textContent = 'EPG';
+          epgBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openEpgModal(ch);
+          });
+          item.appendChild(epgBtn);
+        }
+
         item.addEventListener('click', () => playChannel(ch));
         body.appendChild(item);
       }
@@ -441,42 +554,125 @@
       '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
     }[c]));
   }
-  function escapeAttr(s){ return escapeHtml(s || ''); }
+  // ── EPG (XMLTV compresso .gz) ──────────────────────────────────────
+  function parseXmltvDate(s){
+    // Formato XMLTV: YYYYMMDDHHMMSS [+-]HHMM  (es. "20260703200000 +0200")
+    if (!s) return null;
+    const m = s.trim().match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})\s*([+-]\d{4})?$/);
+    if (!m) return null;
+    const [, Y, Mo, D, H, Mi, S, tz] = m;
+    let iso = `${Y}-${Mo}-${D}T${H}:${Mi}:${S}`;
+    iso += tz ? (tz.slice(0, 3) + ':' + tz.slice(3)) : 'Z';
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? null : d;
+  }
 
-  // ── Proxy CORS automatici (nessuna configurazione richiesta) ──────
-  // Provati in ordine solo se il fetch diretto fallisce per CORS/rete.
+  function formatTime(d){
+    return d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  async function loadEPG(url){
+    try{
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const buf = await res.arrayBuffer();
+      let bytes = new Uint8Array(buf);
+      // decomprimi se è gzip (magic number 1f 8b) o l'URL termina in .gz
+      if ((bytes[0] === 0x1f && bytes[1] === 0x8b) || /\.gz$/i.test(url)){
+        bytes = pako.ungzip(bytes);
+      }
+      const xmlText = new TextDecoder('utf-8').decode(bytes);
+      const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
+      if (xml.querySelector('parsererror')) throw new Error('XML EPG non valido');
+
+      const newMap = new Map();
+      const programmes = xml.getElementsByTagName('programme');
+      for (const p of programmes){
+        const chId = p.getAttribute('channel');
+        const start = parseXmltvDate(p.getAttribute('start'));
+        const stop  = parseXmltvDate(p.getAttribute('stop'));
+        if (!chId || !start || !stop) continue;
+        const titleEl = p.getElementsByTagName('title')[0];
+        const title = titleEl ? titleEl.textContent.trim() : '(senza titolo)';
+        if (!newMap.has(chId)) newMap.set(chId, []);
+        newMap.get(chId).push({ start, stop, title });
+      }
+      epgMap = newMap;
+      renderChannels(els.search.value); // aggiorna anche i pulsanti EPG mostrati
+      return true;
+    }catch(err){
+      console.warn('EPG non caricata:', err.message);
+      return false;
+    }
+  }
+
+  function getNowProgram(tvgId){
+    const progs = epgMap.get(tvgId);
+    if (!progs) return null;
+    const now = new Date();
+    return progs.find(p => now >= p.start && now < p.stop) || null;
+  }
+
+  function nowProgramText(tvgId){
+    if (!tvgId) return '';
+    const p = getNowProgram(tvgId);
+    return p ? `▶ ${formatTime(p.start)}–${formatTime(p.stop)} ${p.title}` : '';
+  }
+
+  function refreshNowPlayingLabels(){
+    els.groups.querySelectorAll('.ch-now').forEach(el => {
+      const tvgId = el.dataset.tvgid;
+      if (tvgId) el.textContent = nowProgramText(tvgId);
+    });
+  }
+  setInterval(refreshNowPlayingLabels, 60000);
+
+  function openEpgModal(ch){
+    els.epgModalTitle.textContent = ch.name;
+    els.epgModalBody.innerHTML = '';
+    const progs = (epgMap.get(ch.tvgId) || []).slice().sort((a, b) => a.start - b.start);
+    if (!progs.length){
+      els.epgModalBody.innerHTML = '<div class="empty-state">Nessun dato EPG disponibile per questo canale.</div>';
+    } else {
+      const now = new Date();
+      for (const p of progs){
+        const row = document.createElement('div');
+        row.className = 'epg-row' + (now >= p.start && now < p.stop ? ' now' : '');
+        const time = document.createElement('span');
+        time.className = 'epg-time';
+        time.textContent = `${formatTime(p.start)}–${formatTime(p.stop)}`;
+        const title = document.createElement('span');
+        title.className = 'epg-title';
+        title.textContent = p.title;
+        row.appendChild(time);
+        row.appendChild(title);
+        els.epgModalBody.appendChild(row);
+      }
+    }
+    els.epgModal.classList.add('show');
+  }
+
+  function closeEpgModal(){
+    els.epgModal.classList.remove('show');
+  }
+
+  // Proxy CORS usati solo come fallback per la riproduzione dello stream
+  // video (alcuni relinker vengono bloccati dal CORS in Chrome/Edge/Firefox).
+  // Non più usati per il caricamento della playlist: caricando streaming.m3u
+  // direttamente da raw.githubusercontent.com il CORS non è un problema.
   const CORS_PROXIES = [
     u => 'https://corsproxy.io/?url=' + encodeURIComponent(u),
     u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
     u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u),
   ];
 
-  // Prova l'URL diretto, poi i proxy in cascata. Restituisce { text, viaProxy }.
-  async function fetchWithFallback(url, onStatus){
-    try{
-      const res = await fetch(url, { cache: 'no-store' });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return { text: await res.text(), viaProxy: false };
-    }catch(directErr){
-      for (let i = 0; i < CORS_PROXIES.length; i++){
-        if (onStatus) onStatus(`Fetch diretto fallito, provo proxy ${i + 1}/${CORS_PROXIES.length}…`);
-        try{
-          const res = await fetch(CORS_PROXIES[i](url), { cache: 'no-store' });
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          const text = await res.text();
-          if (!text || !text.trim()) throw new Error('risposta vuota');
-          return { text, viaProxy: true };
-        }catch(e){ /* prova il prossimo proxy */ }
-      }
-      throw directErr;
-    }
-  }
-
   // ── Caricamento playlist ─────────────────────────────────────────
   async function loadFromUrl(url){
     setHint('Caricamento playlist…');
     try{
-      const { text } = await fetchWithFallback(url, setHint);
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const text = await res.text();
       applyPlaylist(text, url);
     }catch(err){
       setHint('Errore caricamento: ' + err.message);
@@ -649,13 +845,38 @@
   els.search.addEventListener('input', () => renderChannels(els.search.value));
   els.menuBtn.addEventListener('click', () => els.sidebar.classList.toggle('open'));
 
-  // ripristina ultimo URL playlist se presente
-  try{
-    const last = localStorage.getItem('iptv_last_source');
-    if (last && /^https?:\/\//i.test(last)){
-      els.m3uUrl.value = last;
+  els.epgModalClose.addEventListener('click', closeEpgModal);
+  els.epgModal.addEventListener('click', e => { if (e.target === els.epgModal) closeEpgModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEpgModal(); });
+
+  // ── Auto-caricamento da GitHub (playlist + EPG) ────────────────────
+  const AUTO_M3U_URL = 'https://raw.githubusercontent.com/xer94x/epg/main/streaming.m3u';
+  const AUTO_EPG_URL = 'https://raw.githubusercontent.com/xer94x/epg/main/epg/merged_epg.xml.gz';
+
+  async function autoLoad(){
+    els.m3uUrl.value = AUTO_M3U_URL;
+    setHint('Caricamento playlist e guida programmi da GitHub…');
+
+    const [m3uText, epgOk] = await Promise.all([
+      (async () => {
+        try{
+          const res = await fetch(AUTO_M3U_URL, { cache: 'no-store' });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return await res.text();
+        }catch(err){ return null; }
+      })(),
+      loadEPG(AUTO_EPG_URL)
+    ]);
+
+    if (m3uText){
+      applyPlaylist(m3uText, 'streaming.m3u (GitHub)');
+      setHint(els.playlistHint.textContent + (epgOk ? ' · EPG OK' : ' · EPG non disponibile'));
+    } else {
+      setHint('Errore caricamento automatico della playlist — carica manualmente.');
     }
-  }catch(e){}
+  }
+
+  autoLoad();
 
 })();
 </script>
