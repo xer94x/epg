@@ -758,16 +758,6 @@
     els.epgModal.classList.remove('show');
   }
 
-  // Proxy CORS usati solo come fallback per la riproduzione dello stream
-  // video (alcuni relinker vengono bloccati dal CORS in Chrome/Edge/Firefox).
-  // Non più usati per il caricamento della playlist: caricando streaming.m3u
-  // direttamente da raw.githubusercontent.com il CORS non è un problema.
-  const CORS_PROXIES = [
-    u => 'https://corsproxy.io/?url=' + encodeURIComponent(u),
-    u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
-    u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u),
-  ];
-
   // ── Caricamento playlist ─────────────────────────────────────────
   async function loadFromUrl(url){
     setHint('Caricamento playlist…');
@@ -819,24 +809,17 @@
     els.statusPill.textContent = 'CONNESSIONE…';
     els.liveTag.classList.remove('on');
     retryCount = 0;
-    streamCandidates = [ch.url, ...CORS_PROXIES.map(p => p(ch.url))];
-    candidateIndex = 0;
-    startStream(streamCandidates[0]);
+    startStream(ch.url);
     if (window.innerWidth <= 760) els.sidebar.classList.remove('open');
   }
-
-  let streamCandidates = [];
-  let candidateIndex = 0;
 
   function startStream(url){
     clearWatchdog();
     if (hls){ hls.destroy(); hls = null; }
 
-    const viaProxy = candidateIndex > 0;
-
     // Stesso ordine dell'esempio noto funzionante: prova prima l'HLS nativo
     // del browser (Safari/iOS), poi hls.js come fallback.
-    if (els.video.canPlayType('application/vnd.apple.mpegurl') && !viaProxy){
+    if (els.video.canPlayType('application/vnd.apple.mpegurl')){
       els.video.src = url;
       els.video.addEventListener('loadedmetadata', () => {
         els.video.play().catch(() => {});
@@ -890,18 +873,7 @@
     }, 15000);
   }
 
-  // Alcuni stream (es. relinker Rai) funzionano col player nativo (Safari)
-  // ma vengono bloccati dal CORS quando hls.js legge il manifest in Chrome/
-  // Edge/Firefox. Al primo errore di rete si prova automaticamente la stessa
-  // URL passata attraverso una cascata di proxy CORS pubblici, senza che tu
-  // debba configurare nulla.
   function handleStreamError(label){
-    if (candidateIndex < streamCandidates.length - 1){
-      candidateIndex++;
-      els.statusPill.textContent = 'RIPROVO CON PROXY…';
-      startStream(streamCandidates[candidateIndex]);
-      return;
-    }
     scheduleRestart(label);
   }
 
@@ -921,8 +893,7 @@
     setTimeout(() => {
       if (activeChannel){
         els.overlay.classList.remove('show');
-        candidateIndex = 0;
-        startStream(streamCandidates[0] || activeChannel.url);
+        startStream(activeChannel.url);
       }
     }, delay);
   }
