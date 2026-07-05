@@ -565,6 +565,8 @@ Radio Monte Carlo TV:
 Radio Monte Carlo.it
 Radio.Monte.Carlo.it
 RadioMonteCarlo.it
+RMC.it
+Rmc.it
 
 Virgin Radio TV:
 Virgin Radio.it
@@ -1031,6 +1033,7 @@ Sky Cinema Uno HD.it
 Sky Cinema Uno SD
 Sky Cinema Uno.it
 SkyCinemaUno.it
+Sky.Cinema.Uno.it
   
 Sky Cinema Due:
 Sky Cinema Due
@@ -1118,7 +1121,6 @@ Sky Cinema Uno +24:
 SkyCinemaUno+24.it
 Sky Cinema Uno +24 HD.it
 Sky.Cinema.Uno.+24.it
-Sky.Cinema.Uno.it
 Sky Cinema Uno +24.it
 Sky Cinema Uno +1
 Sky Cinema Uno +1 FHD
@@ -1914,10 +1916,6 @@ Radio 105 TV
 Radio.105.it
 Radio 105.it
 
-RMC:
-RMC.it
-Rmc.it
-
 Roma TV:
 RomaTV.it
 
@@ -2024,8 +2022,6 @@ Fox News:
 FoxNews.it
 Fox.News.it
 Fox News.it
-  
-  
 
 ATALANTA:
 ATALANTA.SerieA
