@@ -273,7 +273,7 @@ def parse_gz_epg(filepath: str, alias_map: dict) -> tuple[dict, dict]:
 # Se il nome non e' un alias, aggiungi "epg_id": "<id canonico>".
 _B = "https://www.livesoccertv.com/channels/"
 CHANNELS = [
-    {"name": "Zona DAZN 1",      "url": _B + "dazn-1-italy/",             "every_days": 1, "epg_id": "Zona DAZN"},
+    {"name": "Zona DAZN",        "url": _B + "dazn-1-italy/",             "every_days": 1},
     {"name": "Zona DAZN 2",      "url": _B + "dazn-1-plus/",              "every_days": 1},
     {"name": "DAZN Italia",      "url": _B + "dazn-italy/",               "every_days": 1},
     {"name": "Sky Sport Uno",    "url": _B + "sky-sport-uno/",            "every_days": 1},
@@ -291,11 +291,11 @@ CHANNELS = [
     {"name": "Sky Sport 259",    "url": _B + "sky-calcio-9/",             "every_days": 1},
     {"name": "Sky Sport 260",    "url": _B + "sky-calcio-10/",            "every_days": 1},
     {"name": "RSI LA2",          "url": _B + "rsi-la-2/",                 "every_days": 1},
-    {"name": "Prime Video",      "url": _B + "amazon-prime-video-italy/", "every_days": 7},
+    {"name": "Prime Video",      "url": _B + "amazon-prime-video-italy/", "every_days": 1},
 ]
 
 PAUSE_SECONDS     = (10, 20)   # pausa casuale tra due richieste
-MAX_PER_RUN       = 10         # max canali scaricati per esecuzione (i piu' vecchi per primi)
+MAX_PER_RUN       = len(CHANNELS)   # max canali per esecuzione (tutti); abbassalo per ruotarli (i piu' vecchi per primi)
 KEEP_PAST_DAYS    = 2          # partite piu' vecchie scartate dal JSON
 RETRY_AFTER_HOURS = 6          # dopo un errore/blocco un canale non viene ritentato prima
 EVENT_DURATION    = timedelta(minutes=120)   # il sito non da' la fine: durata fissa
@@ -822,3 +822,4 @@ if __name__ == "__main__":
         print(f"::warning::scraper palinsesti: {scrape_errors} errori (EPG creato comunque)")
 
     merge_epg(args.epg_dir, args.output, args.ref, args.matches)
+
