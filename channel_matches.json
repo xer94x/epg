@@ -1,65 +1,5 @@
 {
   "channels": {
-    "Zona DAZN 1": {
-      "url": "https://www.livesoccertv.com/channels/dazn-1-italy/",
-      "fetched": "2026-11-19T07:02Z",
-      "matches": [
-        {
-          "home": "Lazio",
-          "away": "Lecce",
-          "date": "2026-11-21",
-          "time_page": "09:00",
-          "start_utc": "2026-11-21T14:00Z",
-          "competition": "Serie A",
-          "url": "/match/lazio-vs-lecce/366hz#5653994"
-        },
-        {
-          "home": "Parma",
-          "away": "Roma",
-          "date": "2026-11-21",
-          "time_page": "12:00",
-          "start_utc": "2026-11-21T17:00Z",
-          "competition": "Serie A",
-          "url": "/match/roma-vs-parma/1x14o#5653997"
-        },
-        {
-          "home": "Real Madrid",
-          "away": "Celta de Vigo",
-          "date": "2026-11-21",
-          "time_page": "15:00",
-          "start_utc": "2026-11-21T20:00Z",
-          "competition": "La Liga",
-          "url": "/match/real-madrid-vs-celta-de-vigo/2cvac#5667412"
-        },
-        {
-          "home": "Juventus",
-          "away": "Venezia",
-          "date": "2026-11-22",
-          "time_page": "06:30",
-          "start_utc": "2026-11-22T11:30Z",
-          "competition": "Serie A",
-          "url": "/match/juventus-vs-venezia/859w0#5653993"
-        },
-        {
-          "home": "Bologna",
-          "away": "Udinese",
-          "date": "2026-11-22",
-          "time_page": "09:00",
-          "start_utc": "2026-11-22T14:00Z",
-          "competition": "Serie A",
-          "url": "/match/bologna-vs-udinese/1xaxj#5653991"
-        },
-        {
-          "home": "Atalanta",
-          "away": "Internazionale",
-          "date": "2026-11-22",
-          "time_page": "14:45",
-          "start_utc": "2026-11-22T19:45Z",
-          "competition": "Serie A",
-          "url": "/match/atalanta-vs-internazionale/1wtat#5653990"
-        }
-      ]
-    },
     "Zona DAZN 2": {
       "url": "https://www.livesoccertv.com/channels/dazn-1-plus/",
       "fetched": "2026-11-19T07:02Z",
@@ -406,8 +346,151 @@
       "url": "https://www.livesoccertv.com/channels/sky-calcio-3/",
       "fetched": "2026-11-19T07:04Z",
       "matches": []
+    },
+    "Zona DAZN": {
+      "url": "https://www.livesoccertv.com/channels/dazn-1-italy/",
+      "fetched": "2026-11-19T07:27Z",
+      "matches": [
+        {
+          "home": "Lazio",
+          "away": "Lecce",
+          "date": "2026-11-21",
+          "time_page": "09:00",
+          "start_utc": "2026-11-21T14:00Z",
+          "competition": "Serie A",
+          "url": "/match/lazio-vs-lecce/366hz#5653994"
+        },
+        {
+          "home": "Parma",
+          "away": "Roma",
+          "date": "2026-11-21",
+          "time_page": "12:00",
+          "start_utc": "2026-11-21T17:00Z",
+          "competition": "Serie A",
+          "url": "/match/roma-vs-parma/1x14o#5653997"
+        },
+        {
+          "home": "Real Madrid",
+          "away": "Celta de Vigo",
+          "date": "2026-11-21",
+          "time_page": "15:00",
+          "start_utc": "2026-11-21T20:00Z",
+          "competition": "La Liga",
+          "url": "/match/real-madrid-vs-celta-de-vigo/2cvac#5667412"
+        },
+        {
+          "home": "Juventus",
+          "away": "Venezia",
+          "date": "2026-11-22",
+          "time_page": "06:30",
+          "start_utc": "2026-11-22T11:30Z",
+          "competition": "Serie A",
+          "url": "/match/juventus-vs-venezia/859w0#5653993"
+        },
+        {
+          "home": "Bologna",
+          "away": "Udinese",
+          "date": "2026-11-22",
+          "time_page": "09:00",
+          "start_utc": "2026-11-22T14:00Z",
+          "competition": "Serie A",
+          "url": "/match/bologna-vs-udinese/1xaxj#5653991"
+        },
+        {
+          "home": "Atalanta",
+          "away": "Internazionale",
+          "date": "2026-11-22",
+          "time_page": "14:45",
+          "start_utc": "2026-11-22T19:45Z",
+          "competition": "Serie A",
+          "url": "/match/atalanta-vs-internazionale/1wtat#5653990"
+        }
+      ]
+    },
+    "Sky Sport 254": {
+      "url": "https://www.livesoccertv.com/channels/sky-calcio-4/",
+      "fetched": "2026-11-19T07:27Z",
+      "matches": []
+    },
+    "Sky Sport 255": {
+      "url": "https://www.livesoccertv.com/channels/sky-calcio-5/",
+      "fetched": "2026-11-19T07:27Z",
+      "matches": []
+    },
+    "Sky Sport 256": {
+      "url": "https://www.livesoccertv.com/channels/sky-calcio-6/",
+      "fetched": "2026-11-19T07:27Z",
+      "matches": []
+    },
+    "Sky Sport 257": {
+      "url": "https://www.livesoccertv.com/channels/sky-calcio-7/",
+      "fetched": "2026-11-19T07:28Z",
+      "matches": []
+    },
+    "Sky Sport 258": {
+      "url": "https://www.livesoccertv.com/channels/sky-calcio-8/",
+      "fetched": "2026-11-19T07:28Z",
+      "matches": []
+    },
+    "Sky Sport 259": {
+      "url": "https://www.livesoccertv.com/channels/sky-calcio-9/",
+      "fetched": "2026-11-19T07:28Z",
+      "matches": []
+    },
+    "Sky Sport 260": {
+      "url": "https://www.livesoccertv.com/channels/sky-calcio-10/",
+      "fetched": "2026-11-19T07:28Z",
+      "matches": []
+    },
+    "RSI LA2": {
+      "url": "https://www.livesoccertv.com/channels/rsi-la-2/",
+      "fetched": "2026-11-19T07:29Z",
+      "matches": [
+        {
+          "home": "Sion",
+          "away": "Servette",
+          "date": "2026-11-21",
+          "time_page": "14:30",
+          "start_utc": "2026-11-21T19:30Z",
+          "competition": "Super League",
+          "url": "/match/sion-vs-servette/54u96#5682800"
+        },
+        {
+          "home": "Internazionale",
+          "away": "Stuttgart",
+          "date": "2026-11-25",
+          "time_page": "15:00",
+          "start_utc": "2026-11-25T20:00Z",
+          "competition": "UEFA Champions League",
+          "url": "/match/stuttgart-vs-internazionale/1kznb#5774638"
+        }
+      ]
+    },
+    "Prime Video": {
+      "url": "https://www.livesoccertv.com/channels/amazon-prime-video-italy/",
+      "fetched": "2026-11-19T07:29Z",
+      "matches": [
+        {
+          "home": "PSG",
+          "away": "Roma",
+          "date": "2026-11-25",
+          "time_page": "15:00",
+          "start_utc": "2026-11-25T20:00Z",
+          "competition": "UEFA Champions League",
+          "url": "/match/psg-vs-roma/1naae#5774640"
+        },
+        {
+          "home": "Borussia Dortmund",
+          "away": "Internazionale",
+          "date": "2026-12-09",
+          "time_page": "15:00",
+          "start_utc": "2026-12-09T20:00Z",
+          "competition": "UEFA Champions League",
+          "url": "/match/borussia-dortmund-vs-internazionale/1kjo2#5774655"
+        }
+      ]
     }
   },
-  "updated": "2026-11-19T07:04Z",
+  "updated": "2026-11-19T07:29Z",
   "page_timezone": "America/New_York"
 }
