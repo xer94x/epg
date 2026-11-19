@@ -19,7 +19,7 @@ Eventi live (LiveSoccerTV):
   IGNORANDO le regole di merge: ci sono sempre, con descrizione "Evento Live",
   orario convertito dall'UTC all'offset usato dall'EPG di quel canale.
   Se l'EPG ha gia' quella partita (stesso orario, stesse squadre) si tiene il suo
-  titolo/descrizione e si aggiunge "Evento Live" alla descrizione; altri programmi
+  titolo/descrizione e si antepone "Evento Live - " alla descrizione; altri programmi
   che si sovrappongono a un evento nuovo vengono rimossi.
 
 Uso: python merge_epg.py [epg_dir] [output_gz] [riferimento.txt]
@@ -621,7 +621,8 @@ def inject_events(best_programmes: dict[str, list], events: dict[str, list[dict]
                     d.set("lang", "it")
                     d.text = EVENT_DESC
                 elif EVENT_DESC not in (d.text or ""):
-                    d.text = ((d.text or "").rstrip() + "\n" + EVENT_DESC).strip()
+                    # in testa: i player tagliano le descrizioni lunghe
+                    d.text = (EVENT_DESC + " - " + (d.text or "").lstrip()).rstrip(" -")
                 merged_with[id(hit)] = hit
                 unified += 1
             else:
@@ -822,4 +823,3 @@ if __name__ == "__main__":
         print(f"::warning::scraper palinsesti: {scrape_errors} errori (EPG creato comunque)")
 
     merge_epg(args.epg_dir, args.output, args.ref, args.matches)
-
