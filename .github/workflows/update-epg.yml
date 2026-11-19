@@ -4,9 +4,18 @@ on:
   schedule:
     - cron: "*/15 * * * *"   # ogni 15 minuti, 24 ore su 24
   workflow_dispatch:
+    inputs:
+      all:
+        description: "TEST: scarica TUTTI i canali LiveSoccerTV in un colpo (ignora scadenze e limite di 10)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
+
+concurrency:
+  group: update-epg
+  cancel-in-progress: false
 
 env:
   EPG_URLS: |
@@ -152,14 +161,18 @@ jobs:
           python-version: '3.11'
 
       - name: Installa dipendenze Python
-        run: pip install lxml
+        run: pip install lxml requests beautifulsoup4
 
-      - name: Crea EPG unificato
+      - name: Scrape palinsesti canali e crea EPG unificato
         shell: bash
+        env:
+          PYTHONUNBUFFERED: "1"
         run: |
           echo "========================================"
-          echo "Avvio merge EPG..."
-          python scripts/merge_epg.py epg epg/merged_epg.xml.gz riferimento.txt
+          echo "Avvio scrape palinsesti + merge EPG..."
+          extra=""
+          if [ "${{ github.event.inputs.all }}" = "true" ]; then extra="--all"; fi
+          python scripts/merge_epg.py epg epg/merged_epg.xml.gz riferimento.txt --matches channel_matches.json $extra
           echo "EPG_MERGED_SIZE=$(wc -c < epg/merged_epg.xml.gz)" >> "$GITHUB_ENV"
 
       - name: Commit e push
@@ -171,6 +184,7 @@ jobs:
           # Traccia script e riferimento (solo se modificati), sempre i gz
           git add scripts/merge_epg.py riferimento.txt 2>/dev/null || true
           git add epg/*.gz 2>/dev/null || true
+          git add channel_matches.json 2>/dev/null || true
 
           if git diff --cached --quiet; then
             echo "Nessuna modifica EPG"
