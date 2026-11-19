@@ -1,0 +1,26 @@
+{
+  "source": "https://www.livesoccertv.com/channels/amazon-prime-video-italy/",
+  "channel": "Prime Video",
+  "page_timezone": "America/New_York",
+  "updated": "2026-11-19T04:54Z",
+  "matches": [
+    {
+      "home": "PSG",
+      "away": "Roma",
+      "date": "2026-11-25",
+      "time_page": "15:00",
+      "start_utc": "2026-11-25T20:00Z",
+      "competition": "UEFA Champions League",
+      "url": "/match/psg-vs-roma/1naae#5774640"
+    },
+    {
+      "home": "Borussia Dortmund",
+      "away": "Internazionale",
+      "date": "2026-12-09",
+      "time_page": "15:00",
+      "start_utc": "2026-12-09T20:00Z",
+      "competition": "UEFA Champions League",
+      "url": "/match/borussia-dortmund-vs-internazionale/1kjo2#5774655"
+    }
+  ]
+}
