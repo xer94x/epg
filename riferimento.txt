@@ -813,7 +813,6 @@ Sky Sport Football
 Sky Sport Football FHD
 Sky Sport Football Full HD
 Sky Sport Football HD
-Sky Sport Full HD
 
 Rai Radio 2 Visual:
 Rai Radio 2.it
@@ -2152,5 +2151,11 @@ Esport 24.it
 Bigg Tv.it:
 Bigg Tv.it
 
+DAZN Italia:
+DAZN Italia
+DAZN Italia.it
 
-
+Prime Video:
+Prime Video
+Prime Video.it
+Amazon Prime Video
