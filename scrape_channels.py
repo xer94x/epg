@@ -10,7 +10,7 @@ salva in channel_matches.json.
 - Se un canale fallisce restano i suoi dati precedenti e gli altri vengono salvati.
 - Exit 1 se almeno un canale ha dato errore (il file viene comunque scritto).
 
-Uso:  python scrape_channels.py [--out channel_matches.json] [--force]
+Uso:  python scrape_channels.py [--out channel_matches.json] [--force] [--all]
 Env:  PAGE_TZ  fuso in cui il sito mostra gli orari (default America/New_York)
 """
 import argparse, json, os, random, re, sys, time
@@ -167,7 +167,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="channel_matches.json")
     ap.add_argument("--force", action="store_true", help="ignora every_days (resta il tetto MAX_PER_RUN)")
+    ap.add_argument("--all", action="store_true", help="TEST: scarica tutti i canali, ignorando every_days e MAX_PER_RUN")
     args = ap.parse_args()
+    max_per_run = len(CHANNELS) if args.all else MAX_PER_RUN
+    if args.all:
+        args.force = True
     tz_name = os.environ.get("PAGE_TZ", "America/New_York")
 
     try:
@@ -184,7 +188,7 @@ def main():
     # piu' vecchi per primi; a parita' (es. primo giro, mai scaricati) vale l'ordine della lista
     order = {c["name"]: i for i, c in enumerate(CHANNELS)}
     due.sort(key=lambda c: ((chans.get(c["name"]) or {}).get("fetched") or "", order[c["name"]]))
-    todo, later = due[:MAX_PER_RUN], due[MAX_PER_RUN:]
+    todo, later = due[:max_per_run], due[max_per_run:]
     for c in CHANNELS:
         if c not in due:
             print(f"[{c['name']}] aggiornato il {chans[c['name']]['fetched']}: salto")
