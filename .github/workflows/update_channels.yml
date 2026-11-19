@@ -26,6 +26,8 @@ jobs:
       - name: Scarica i palinsesti
         id: scrape
         continue-on-error: true
+        env:
+          PYTHONUNBUFFERED: "1"      # mostra i log in tempo reale
         run: |
           if [ "${{ github.event.inputs.force }}" = "true" ]; then
             python scrape_channels.py --out channel_matches.json --force
