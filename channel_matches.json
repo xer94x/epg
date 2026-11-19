@@ -406,8 +406,91 @@
       "url": "https://www.livesoccertv.com/channels/sky-calcio-3/",
       "fetched": "2026-11-19T06:25Z",
       "matches": []
+    },
+    "Sky Sport 254": {
+      "url": "https://www.livesoccertv.com/channels/sky-calcio-4/",
+      "fetched": "2026-11-19T06:30Z",
+      "matches": []
+    },
+    "Sky Sport 255": {
+      "url": "https://www.livesoccertv.com/channels/sky-calcio-5/",
+      "fetched": "2026-11-19T06:30Z",
+      "matches": []
+    },
+    "Sky Sport 256": {
+      "url": "https://www.livesoccertv.com/channels/sky-calcio-6/",
+      "fetched": "2026-11-19T06:30Z",
+      "matches": []
+    },
+    "Sky Sport 257": {
+      "url": "https://www.livesoccertv.com/channels/sky-calcio-7/",
+      "fetched": "2026-11-19T06:30Z",
+      "matches": []
+    },
+    "Sky Sport 258": {
+      "url": "https://www.livesoccertv.com/channels/sky-calcio-8/",
+      "fetched": "2026-11-19T06:31Z",
+      "matches": []
+    },
+    "Sky Sport 259": {
+      "url": "https://www.livesoccertv.com/channels/sky-calcio-9/",
+      "fetched": "2026-11-19T06:31Z",
+      "matches": []
+    },
+    "Sky Sport 260": {
+      "url": "https://www.livesoccertv.com/channels/sky-calcio-10/",
+      "fetched": "2026-11-19T06:31Z",
+      "matches": []
+    },
+    "RSI LA2": {
+      "url": "https://www.livesoccertv.com/channels/rsi-la-2/",
+      "fetched": "2026-11-19T06:31Z",
+      "matches": [
+        {
+          "home": "Sion",
+          "away": "Servette",
+          "date": "2026-11-21",
+          "time_page": "14:30",
+          "start_utc": "2026-11-21T19:30Z",
+          "competition": "Super League",
+          "url": "/match/sion-vs-servette/54u96#5682800"
+        },
+        {
+          "home": "Internazionale",
+          "away": "Stuttgart",
+          "date": "2026-11-25",
+          "time_page": "15:00",
+          "start_utc": "2026-11-25T20:00Z",
+          "competition": "UEFA Champions League",
+          "url": "/match/stuttgart-vs-internazionale/1kznb#5774638"
+        }
+      ]
+    },
+    "Prime Video": {
+      "url": "https://www.livesoccertv.com/channels/amazon-prime-video-italy/",
+      "fetched": "2026-11-19T06:32Z",
+      "matches": [
+        {
+          "home": "PSG",
+          "away": "Roma",
+          "date": "2026-11-25",
+          "time_page": "15:00",
+          "start_utc": "2026-11-25T20:00Z",
+          "competition": "UEFA Champions League",
+          "url": "/match/psg-vs-roma/1naae#5774640"
+        },
+        {
+          "home": "Borussia Dortmund",
+          "away": "Internazionale",
+          "date": "2026-12-09",
+          "time_page": "15:00",
+          "start_utc": "2026-12-09T20:00Z",
+          "competition": "UEFA Champions League",
+          "url": "/match/borussia-dortmund-vs-internazionale/1kjo2#5774655"
+        }
+      ]
     }
   },
-  "updated": "2026-11-19T06:25Z",
+  "updated": "2026-11-19T06:32Z",
   "page_timezone": "America/New_York"
 }
