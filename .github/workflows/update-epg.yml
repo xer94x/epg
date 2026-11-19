@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       all:
-        description: "TEST: scarica TUTTI i canali LiveSoccerTV in un colpo (ignora scadenze e limite di 10)"
+        description: "TEST: scarica TUTTI i canali LiveSoccerTV in un colpo (ignora le scadenze)"
         type: boolean
         default: false
 
