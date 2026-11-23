@@ -790,6 +790,7 @@ SkySport24.it
 Sky.Sport.24.it
 
 Sky Sport Uno:
+SkySport.it
 Sky Sport Uno
 Sky Sport
 Sky Sport HD
@@ -803,7 +804,6 @@ Sky Sport 4K.it
 SkySport4K.it
 Sky.Sport.4K.it
 Sky Sport.it
-SkySport.it
 
 Sky Sport Calcio:
 Sky Sport Calcio.it
@@ -2142,3 +2142,4 @@ Prime Video:
 Prime Video
 Prime Video.it
 Amazon Prime Video
+
