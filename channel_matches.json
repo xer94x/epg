@@ -2,17 +2,8 @@
   "channels": {
     "Zona DAZN 2": {
       "url": "https://www.livesoccertv.com/channels/dazn-1-plus/",
-      "fetched": "2026-11-23T14:48Z",
+      "fetched": "2026-11-24T02:58Z",
       "matches": [
-        {
-          "home": "Como",
-          "away": "Cagliari",
-          "date": "2026-11-21",
-          "time_page": "09:00",
-          "start_utc": "2026-11-21T14:00Z",
-          "competition": "Serie A",
-          "url": "/match/cagliari-vs-como/6hxym#5653992"
-        },
         {
           "home": "Sassuolo",
           "away": "Genoa",
@@ -26,53 +17,8 @@
     },
     "DAZN Italia": {
       "url": "https://www.livesoccertv.com/channels/dazn-italy/",
-      "fetched": "2026-11-23T14:48Z",
+      "fetched": "2026-11-24T02:59Z",
       "matches": [
-        {
-          "home": "Flamurtari",
-          "away": "Bylis Ballsh",
-          "date": "2026-11-23",
-          "time_page": "10:00",
-          "start_utc": "2026-11-23T15:00Z",
-          "competition": "Kategoria e Parë",
-          "url": "/match/flamurtari-vs-bylis-ballsh/egxe3#5762702"
-        },
-        {
-          "home": "Bayern",
-          "away": "Hoffenheim",
-          "date": "2026-11-23",
-          "time_page": "12:00",
-          "start_utc": "2026-11-23T17:00Z",
-          "competition": "Frauen-Bundesliga",
-          "url": "/match/bayern-vs-hoffenheim/4ij0k3#5759124"
-        },
-        {
-          "home": "Ceuta",
-          "away": "Almería",
-          "date": "2026-11-23",
-          "time_page": "14:30",
-          "start_utc": "2026-11-23T19:30Z",
-          "competition": "Segunda Division",
-          "url": "/match/almeria-vs-ceuta/dyrdd#5683685"
-        },
-        {
-          "home": "Monza",
-          "away": "Fiorentina",
-          "date": "2026-11-23",
-          "time_page": "14:45",
-          "start_utc": "2026-11-23T19:45Z",
-          "competition": "Serie A",
-          "url": "/match/fiorentina-vs-monza/6iy1u#5653995"
-        },
-        {
-          "home": "Levante",
-          "away": "Elche",
-          "date": "2026-11-23",
-          "time_page": "15:00",
-          "start_utc": "2026-11-23T20:00Z",
-          "competition": "La Liga",
-          "url": "/match/elche-vs-levante/3powa#5823111"
-        },
         {
           "home": "Juve Stabia",
           "away": "Catanzaro",
@@ -209,6 +155,51 @@
           "url": "/match/halifax-town-vs-fylde/8dhln#5682401"
         },
         {
+          "home": "King's Lynn Town",
+          "away": "Radcliffe Borough",
+          "date": "2026-11-24",
+          "time_page": "14:45",
+          "start_utc": "2026-11-24T19:45Z",
+          "competition": "National League N / S",
+          "url": "/match/radcliffe-borough-vs-kings-lynn-town/uvivy#5685683"
+        },
+        {
+          "home": "Scunthorpe United",
+          "away": "Gateshead",
+          "date": "2026-11-24",
+          "time_page": "14:45",
+          "start_utc": "2026-11-24T19:45Z",
+          "competition": "National League",
+          "url": "/match/scunthorpe-united-vs-gateshead/276a1#5682408"
+        },
+        {
+          "home": "Woking",
+          "away": "Worthing",
+          "date": "2026-11-24",
+          "time_page": "14:45",
+          "start_utc": "2026-11-24T19:45Z",
+          "competition": "National League",
+          "url": "/match/woking-vs-worthing/8t9k3#5682409"
+        },
+        {
+          "home": "Shabab Al Sahel",
+          "away": "Al Ansar",
+          "date": "2026-11-25",
+          "time_page": "07:15",
+          "start_utc": "2026-11-25T12:15Z",
+          "competition": "Lebanese Premier League",
+          "url": "/match/al-ansar-vs-shabab-al-sahel/or5up#5815733"
+        },
+        {
+          "home": "Racing Club Brazzavile",
+          "away": "Étoile du Congo",
+          "date": "2026-11-25",
+          "time_page": "08:00",
+          "start_utc": "2026-11-25T13:00Z",
+          "competition": "Congo Ligue 1",
+          "url": "/match/etoile-du-congo-vs-racing-club-brazzavile/2xmboq#5833874"
+        },
+        {
           "home": "Safa",
           "away": "Al Nejmeh",
           "date": "2026-11-25",
@@ -234,31 +225,13 @@
           "start_utc": "2026-12-04T12:15Z",
           "competition": "Lebanese Premier League",
           "url": "/match/tadamon-sour-vs-al-mabarrah/otbar#5840337"
-        },
-        {
-          "home": "Atlètic Club d'Escaldes",
-          "away": "FC Santa Coloma",
-          "date": "2026-11-21",
-          "time_page": "05:00",
-          "start_utc": "2026-11-21T10:00Z",
-          "competition": "Primera Divisió",
-          "url": "/match/fc-santa-coloma-vs-atletic-club-descaldes/27jtc4#5758083"
         }
       ]
     },
     "Sky Sport Uno": {
       "url": "https://www.livesoccertv.com/channels/sky-sport-uno/",
-      "fetched": "2026-11-23T14:48Z",
+      "fetched": "2026-11-24T02:59Z",
       "matches": [
-        {
-          "home": "Grosseto",
-          "away": "Nuova Monterosi",
-          "date": "2026-11-23",
-          "time_page": "14:30",
-          "start_utc": "2026-11-23T19:30Z",
-          "competition": "Serie C",
-          "url": "/match/grosseto-vs-nuova-monterosi/1c1yg2#5720797"
-        },
         {
           "home": "Manchester City",
           "away": "Napoli",
@@ -308,17 +281,8 @@
     },
     "Sky Sport Calcio": {
       "url": "https://www.livesoccertv.com/channels/sky-sport-serie-a/",
-      "fetched": "2026-11-23T14:49Z",
+      "fetched": "2026-11-24T02:59Z",
       "matches": [
-        {
-          "home": "Monza",
-          "away": "Fiorentina",
-          "date": "2026-11-23",
-          "time_page": "14:45",
-          "start_utc": "2026-11-23T19:45Z",
-          "competition": "Serie A",
-          "url": "/match/fiorentina-vs-monza/6iy1u#5653995"
-        },
         {
           "home": "Galatasaray",
           "away": "Aston Villa",
@@ -404,17 +368,8 @@
     },
     "Sky Sport Max": {
       "url": "https://www.livesoccertv.com/channels/sky-sport-collection/",
-      "fetched": "2026-11-23T14:49Z",
+      "fetched": "2026-11-24T02:59Z",
       "matches": [
-        {
-          "home": "Lecco",
-          "away": "Lumezzane",
-          "date": "2026-11-23",
-          "time_page": "14:45",
-          "start_utc": "2026-11-23T19:45Z",
-          "competition": "Serie C",
-          "url": "/match/lumezzane-vs-lecco/dzqk7#5720421"
-        },
         {
           "home": "Atalanta II",
           "away": "Pineto",
@@ -437,17 +392,8 @@
     },
     "Sky Sport Arena": {
       "url": "https://www.livesoccertv.com/channels/sky-sport-arena-italy/",
-      "fetched": "2026-11-23T14:49Z",
+      "fetched": "2026-11-24T03:00Z",
       "matches": [
-        {
-          "home": "Brentford",
-          "away": "Everton",
-          "date": "2026-11-23",
-          "time_page": "15:00",
-          "start_utc": "2026-11-23T20:00Z",
-          "competition": "Premier League",
-          "url": "/match/everton-vs-brentford/26b0n#5661132"
-        },
         {
           "home": "Bodø / Glimt",
           "away": "LASK Linz",
@@ -470,17 +416,8 @@
     },
     "Sky Sport 251": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-1/",
-      "fetched": "2026-11-23T14:49Z",
+      "fetched": "2026-11-24T03:00Z",
       "matches": [
-        {
-          "home": "Monza",
-          "away": "Fiorentina",
-          "date": "2026-11-23",
-          "time_page": "14:45",
-          "start_utc": "2026-11-23T19:45Z",
-          "competition": "Serie A",
-          "url": "/match/fiorentina-vs-monza/6iy1u#5653995"
-        },
         {
           "home": "Audace Cerignola",
           "away": "Inter II",
@@ -521,17 +458,8 @@
     },
     "Sky Sport 252": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-2/",
-      "fetched": "2026-11-23T14:49Z",
+      "fetched": "2026-11-24T03:00Z",
       "matches": [
-        {
-          "home": "Grosseto",
-          "away": "Nuova Monterosi",
-          "date": "2026-11-23",
-          "time_page": "14:30",
-          "start_utc": "2026-11-23T19:30Z",
-          "competition": "Serie C",
-          "url": "/match/grosseto-vs-nuova-monterosi/1c1yg2#5720797"
-        },
         {
           "home": "Manchester City",
           "away": "Napoli",
@@ -563,17 +491,8 @@
     },
     "Sky Sport 253": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-3/",
-      "fetched": "2026-11-23T14:50Z",
+      "fetched": "2026-11-24T03:00Z",
       "matches": [
-        {
-          "home": "Lecco",
-          "away": "Lumezzane",
-          "date": "2026-11-23",
-          "time_page": "14:45",
-          "start_utc": "2026-11-23T19:45Z",
-          "competition": "Serie C",
-          "url": "/match/lumezzane-vs-lecco/dzqk7#5720421"
-        },
         {
           "home": "Como",
           "away": "AEK Athens",
@@ -614,7 +533,7 @@
     },
     "Zona DAZN": {
       "url": "https://www.livesoccertv.com/channels/dazn-1-italy/",
-      "fetched": "2026-11-23T14:48Z",
+      "fetched": "2026-11-24T02:58Z",
       "matches": [
         {
           "home": "Frosinone",
@@ -692,7 +611,7 @@
     },
     "Sky Sport 254": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-4/",
-      "fetched": "2026-11-23T14:50Z",
+      "fetched": "2026-11-24T03:01Z",
       "matches": [
         {
           "home": "Galatasaray",
@@ -752,7 +671,7 @@
     },
     "Sky Sport 255": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-5/",
-      "fetched": "2026-11-23T14:50Z",
+      "fetched": "2026-11-24T03:01Z",
       "matches": [
         {
           "home": "Bodø / Glimt",
@@ -812,7 +731,7 @@
     },
     "Sky Sport 256": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-6/",
-      "fetched": "2026-11-23T14:50Z",
+      "fetched": "2026-11-24T03:01Z",
       "matches": [
         {
           "home": "Feyenoord",
@@ -854,7 +773,7 @@
     },
     "Sky Sport 257": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-7/",
-      "fetched": "2026-11-23T14:51Z",
+      "fetched": "2026-11-24T03:01Z",
       "matches": [
         {
           "home": "RB Leipzig",
@@ -896,7 +815,7 @@
     },
     "Sky Sport 258": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-8/",
-      "fetched": "2026-11-23T14:51Z",
+      "fetched": "2026-11-24T03:02Z",
       "matches": [
         {
           "home": "Slovan Bratislava",
@@ -911,27 +830,17 @@
     },
     "Sky Sport 259": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-9/",
-      "fetched": "2026-11-23T14:51Z",
-      "matches": [
-        {
-          "home": "AFC Bournemouth",
-          "away": "Nottingham Forest",
-          "date": "2026-11-21",
-          "time_page": "10:00",
-          "start_utc": "2026-11-21T15:00Z",
-          "competition": "Premier League",
-          "url": "/match/nottingham-forest-vs-afc-bournemouth/3a4uy#5661131"
-        }
-      ]
+      "fetched": "2026-11-24T03:02Z",
+      "matches": []
     },
     "Sky Sport 260": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-10/",
-      "fetched": "2026-11-23T14:52Z",
+      "fetched": "2026-11-24T03:02Z",
       "matches": []
     },
     "RSI LA2": {
       "url": "https://www.livesoccertv.com/channels/rsi-la-2/",
-      "fetched": "2026-11-23T14:52Z",
+      "fetched": "2026-11-24T03:02Z",
       "matches": [
         {
           "home": "Internazionale",
@@ -964,7 +873,7 @@
     },
     "Prime Video": {
       "url": "https://www.livesoccertv.com/channels/amazon-prime-video-italy/",
-      "fetched": "2026-11-23T14:52Z",
+      "fetched": "2026-11-24T03:03Z",
       "matches": [
         {
           "home": "PSG",
@@ -987,6 +896,6 @@
       ]
     }
   },
-  "updated": "2026-11-23T14:52Z",
+  "updated": "2026-11-24T03:03Z",
   "page_timezone": "America/New_York"
 }
