@@ -2,7 +2,7 @@
   "channels": {
     "Zona DAZN 2": {
       "url": "https://www.livesoccertv.com/channels/dazn-1-plus/",
-      "fetched": "2026-11-24T02:58Z",
+      "fetched": "2026-11-24T13:21Z",
       "matches": [
         {
           "home": "Sassuolo",
@@ -17,7 +17,7 @@
     },
     "DAZN Italia": {
       "url": "https://www.livesoccertv.com/channels/dazn-italy/",
-      "fetched": "2026-11-24T02:59Z",
+      "fetched": "2026-11-24T13:21Z",
       "matches": [
         {
           "home": "Juve Stabia",
@@ -230,7 +230,7 @@
     },
     "Sky Sport Uno": {
       "url": "https://www.livesoccertv.com/channels/sky-sport-uno/",
-      "fetched": "2026-11-24T02:59Z",
+      "fetched": "2026-11-24T13:21Z",
       "matches": [
         {
           "home": "Manchester City",
@@ -281,7 +281,7 @@
     },
     "Sky Sport Calcio": {
       "url": "https://www.livesoccertv.com/channels/sky-sport-serie-a/",
-      "fetched": "2026-11-24T02:59Z",
+      "fetched": "2026-11-24T13:22Z",
       "matches": [
         {
           "home": "Galatasaray",
@@ -302,7 +302,7 @@
           "url": "/match/arsenal-vs-borussia-dortmund/182qc#5774627"
         },
         {
-          "home": "PSG U19",
+          "home": "Psg U19",
           "away": "AS Roma U19",
           "date": "2026-11-25",
           "time_page": "10:00",
@@ -368,7 +368,7 @@
     },
     "Sky Sport Max": {
       "url": "https://www.livesoccertv.com/channels/sky-sport-collection/",
-      "fetched": "2026-11-24T02:59Z",
+      "fetched": "2026-11-24T13:22Z",
       "matches": [
         {
           "home": "Atalanta II",
@@ -392,7 +392,7 @@
     },
     "Sky Sport Arena": {
       "url": "https://www.livesoccertv.com/channels/sky-sport-arena-italy/",
-      "fetched": "2026-11-24T03:00Z",
+      "fetched": "2026-11-24T13:22Z",
       "matches": [
         {
           "home": "Bodø / Glimt",
@@ -416,7 +416,7 @@
     },
     "Sky Sport 251": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-1/",
-      "fetched": "2026-11-24T03:00Z",
+      "fetched": "2026-11-24T13:23Z",
       "matches": [
         {
           "home": "Audace Cerignola",
@@ -458,7 +458,7 @@
     },
     "Sky Sport 252": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-2/",
-      "fetched": "2026-11-24T03:00Z",
+      "fetched": "2026-11-24T13:23Z",
       "matches": [
         {
           "home": "Manchester City",
@@ -491,7 +491,7 @@
     },
     "Sky Sport 253": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-3/",
-      "fetched": "2026-11-24T03:00Z",
+      "fetched": "2026-11-24T13:23Z",
       "matches": [
         {
           "home": "Como",
@@ -533,7 +533,7 @@
     },
     "Zona DAZN": {
       "url": "https://www.livesoccertv.com/channels/dazn-1-italy/",
-      "fetched": "2026-11-24T02:58Z",
+      "fetched": "2026-11-24T13:21Z",
       "matches": [
         {
           "home": "Frosinone",
@@ -611,7 +611,7 @@
     },
     "Sky Sport 254": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-4/",
-      "fetched": "2026-11-24T03:01Z",
+      "fetched": "2026-11-24T13:23Z",
       "matches": [
         {
           "home": "Galatasaray",
@@ -671,7 +671,7 @@
     },
     "Sky Sport 255": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-5/",
-      "fetched": "2026-11-24T03:01Z",
+      "fetched": "2026-11-24T13:24Z",
       "matches": [
         {
           "home": "Bodø / Glimt",
@@ -731,7 +731,7 @@
     },
     "Sky Sport 256": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-6/",
-      "fetched": "2026-11-24T03:01Z",
+      "fetched": "2026-11-24T13:24Z",
       "matches": [
         {
           "home": "Feyenoord",
@@ -773,7 +773,7 @@
     },
     "Sky Sport 257": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-7/",
-      "fetched": "2026-11-24T03:01Z",
+      "fetched": "2026-11-24T13:24Z",
       "matches": [
         {
           "home": "RB Leipzig",
@@ -815,7 +815,7 @@
     },
     "Sky Sport 258": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-8/",
-      "fetched": "2026-11-24T03:02Z",
+      "fetched": "2026-11-24T13:25Z",
       "matches": [
         {
           "home": "Slovan Bratislava",
@@ -830,17 +830,17 @@
     },
     "Sky Sport 259": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-9/",
-      "fetched": "2026-11-24T03:02Z",
+      "fetched": "2026-11-24T13:25Z",
       "matches": []
     },
     "Sky Sport 260": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-10/",
-      "fetched": "2026-11-24T03:02Z",
+      "fetched": "2026-11-24T13:25Z",
       "matches": []
     },
     "RSI LA2": {
       "url": "https://www.livesoccertv.com/channels/rsi-la-2/",
-      "fetched": "2026-11-24T03:02Z",
+      "fetched": "2026-11-24T13:25Z",
       "matches": [
         {
           "home": "Internazionale",
@@ -873,7 +873,7 @@
     },
     "Prime Video": {
       "url": "https://www.livesoccertv.com/channels/amazon-prime-video-italy/",
-      "fetched": "2026-11-24T03:03Z",
+      "fetched": "2026-11-24T13:25Z",
       "matches": [
         {
           "home": "PSG",
@@ -896,6 +896,6 @@
       ]
     }
   },
-  "updated": "2026-11-24T03:03Z",
+  "updated": "2026-11-24T13:25Z",
   "page_timezone": "America/New_York"
 }
