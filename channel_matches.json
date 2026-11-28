@@ -2,219 +2,210 @@
   "channels": {
     "Zona DAZN 2": {
       "url": "https://www.livesoccertv.com/channels/dazn-1-plus/",
-      "fetched": "2026-11-28T01:57Z",
+      "fetched": "2026-11-28T17:48Z",
       "matches": []
     },
     "DAZN Italia": {
       "url": "https://www.livesoccertv.com/channels/dazn-italy/",
-      "fetched": "2026-11-28T01:57Z",
+      "fetched": "2026-11-28T17:48Z",
       "matches": [
         {
-          "home": "Fylde",
-          "away": "Aldershot Town",
+          "home": "Cs Bamako",
+          "away": "Stade Malien",
           "date": "2026-11-28",
-          "time_page": "07:30",
-          "start_utc": "2026-11-28T12:30Z",
-          "competition": "National League",
-          "url": "/match/aldershot-town-vs-fylde/7xo9q#5682414"
+          "time_page": "11:00",
+          "start_utc": "2026-11-28T16:00Z",
+          "competition": "Première Division",
+          "url": "/match/cs-bamako-vs-stade-malien/1dmtx5l44#5841432"
         },
         {
-          "home": "Vora",
-          "away": "Teuta Durrës",
+          "home": "US Bougouba",
+          "away": "Derby Academie",
           "date": "2026-11-28",
-          "time_page": "07:30",
-          "start_utc": "2026-11-28T12:30Z",
-          "competition": "Kategoria Superiore",
-          "url": "/match/teuta-durres-vs-vora/25vktb#5688674"
+          "time_page": "11:00",
+          "start_utc": "2026-11-28T16:00Z",
+          "competition": "Première Division",
+          "url": "/match/us-bougouba-vs-derby-academie/kdlo21#5841431"
         },
         {
-          "home": "Woking",
-          "away": "Barrow",
+          "home": "Vicenza",
+          "away": "Cesena",
           "date": "2026-11-28",
-          "time_page": "07:30",
-          "start_utc": "2026-11-28T12:30Z",
-          "competition": "National League",
-          "url": "/match/barrow-vs-woking/56pyw#5682415"
-        },
-        {
-          "home": "Csm Diables Noirs",
-          "away": "AS Juk",
-          "date": "2026-11-28",
-          "time_page": "08:00",
-          "start_utc": "2026-11-28T13:00Z",
-          "competition": "Congo Ligue 1",
-          "url": "/match/csm-diables-noirs-vs-as-juk/1dt3qh58a#5841776"
-        },
-        {
-          "home": "KFA",
-          "away": "Léopards de Dolisié",
-          "date": "2026-11-28",
-          "time_page": "08:00",
-          "start_utc": "2026-11-28T13:00Z",
-          "competition": "Congo Ligue 1",
-          "url": "/match/leopards-de-dolisie-vs-kfa/536k0h#5833879"
-        },
-        {
-          "home": "Real Betis",
-          "away": "Rayo Vallecano",
-          "date": "2026-11-28",
-          "time_page": "08:00",
-          "start_utc": "2026-11-28T13:00Z",
-          "competition": "La Liga",
-          "url": "/match/rayo-vallecano-vs-real-betis/3qg6q#5667414"
-        },
-        {
-          "home": "Ascoli",
-          "away": "Virtus Entella",
-          "date": "2026-11-28",
-          "time_page": "09:00",
-          "start_utc": "2026-11-28T14:00Z",
+          "time_page": "11:15",
+          "start_utc": "2026-11-28T16:15Z",
           "competition": "Serie B",
-          "url": "/match/ascoli-vs-virtus-entella/8reyw#5742597"
+          "url": "/match/cesena-vs-vicenza/4q0hm#5742601"
         },
         {
-          "home": "Carrarese",
-          "away": "Juve Stabia",
+          "home": "Torino",
+          "away": "Lazio",
           "date": "2026-11-28",
-          "time_page": "09:00",
-          "start_utc": "2026-11-28T14:00Z",
-          "competition": "Serie B",
-          "url": "/match/juve-stabia-vs-carrarese/aonkx#5742598"
-        },
-        {
-          "home": "Empoli",
-          "away": "Verona",
-          "date": "2026-11-28",
-          "time_page": "09:00",
-          "start_utc": "2026-11-28T14:00Z",
-          "competition": "Serie B",
-          "url": "/match/empoli-vs-verona/66gdm#5742600"
-        },
-        {
-          "home": "Frosinone",
-          "away": "Parma",
-          "date": "2026-11-28",
-          "time_page": "09:00",
-          "start_utc": "2026-11-28T14:00Z",
+          "time_page": "12:00",
+          "start_utc": "2026-11-28T17:00Z",
           "competition": "Serie A",
-          "url": "/match/parma-vs-frosinone/3690l#5654002"
+          "url": "/match/lazio-vs-torino/36j3q#5654006"
         },
         {
-          "home": "AFC Hornchurch",
-          "away": "Solihull Moors",
+          "home": "Elche",
+          "away": "Atlético Madrid",
           "date": "2026-11-28",
-          "time_page": "10:00",
-          "start_utc": "2026-11-28T15:00Z",
+          "time_page": "12:30",
+          "start_utc": "2026-11-28T17:30Z",
+          "competition": "La Liga",
+          "url": "/match/atletico-madrid-vs-elche/2cbs5#5667417"
+        },
+        {
+          "home": "Hartlepool United",
+          "away": "Southend United",
+          "date": "2026-11-28",
+          "time_page": "12:30",
+          "start_utc": "2026-11-28T17:30Z",
           "competition": "National League",
-          "url": "/match/solihull-moors-vs-afc-hornchurch/8c4ja#5682423"
-        },
-        {
-          "home": "Altrincham",
-          "away": "Worthing",
-          "date": "2026-11-28",
-          "time_page": "10:00",
-          "start_utc": "2026-11-28T15:00Z",
-          "competition": "National League",
-          "url": "/match/altrincham-vs-worthing/5orhq#5682416"
-        },
-        {
-          "home": "Boreham Wood",
-          "away": "Gateshead",
-          "date": "2026-11-28",
-          "time_page": "10:00",
-          "start_utc": "2026-11-28T15:00Z",
-          "competition": "National League",
-          "url": "/match/gateshead-vs-boreham-wood/58vhq#5682417"
-        },
-        {
-          "home": "Boston United",
-          "away": "Kidderminster Harriers",
-          "date": "2026-11-28",
-          "time_page": "10:00",
-          "start_utc": "2026-11-28T15:00Z",
-          "competition": "National League",
-          "url": "/match/kidderminster-harriers-vs-boston-united/550we#5682418"
-        },
-        {
-          "home": "Carlisle United",
-          "away": "Sutton United",
-          "date": "2026-11-28",
-          "time_page": "10:00",
-          "start_utc": "2026-11-28T15:00Z",
-          "competition": "National League",
-          "url": "/match/carlisle-united-vs-sutton-united/5kdp4#5682419"
-        },
-        {
-          "home": "Eastleigh",
-          "away": "Halifax Town",
-          "date": "2026-11-28",
-          "time_page": "10:00",
-          "start_utc": "2026-11-28T15:00Z",
-          "competition": "National League",
-          "url": "/match/halifax-town-vs-eastleigh/854u0#5682420"
-        },
-        {
-          "home": "Étoile du Congo",
-          "away": "CARA Brazzaville",
-          "date": "2026-11-28",
-          "time_page": "10:00",
-          "start_utc": "2026-11-28T15:00Z",
-          "competition": "Congo Ligue 1",
-          "url": "/match/etoile-du-congo-vs-cara-brazzaville/11g5fk#5833880"
-        },
-        {
-          "home": "Forest Green Rovers",
-          "away": "Tamworth",
-          "date": "2026-11-28",
-          "time_page": "10:00",
-          "start_utc": "2026-11-28T15:00Z",
-          "competition": "National League",
-          "url": "/match/forest-green-rovers-vs-tamworth/2wuue#5682421"
-        },
-        {
-          "home": "Harrogate Town",
-          "away": "Yeovil Town",
-          "date": "2026-11-28",
-          "time_page": "10:00",
-          "start_utc": "2026-11-28T15:00Z",
-          "competition": "National League",
-          "url": "/match/yeovil-town-vs-harrogate-town/5ipqu#5682422"
-        },
-        {
-          "home": "Salisbury City",
-          "away": "Dagenham & Redbridge",
-          "date": "2026-11-28",
-          "time_page": "10:00",
-          "start_utc": "2026-11-28T15:00Z",
-          "competition": "National League N / S",
-          "url": "/match/dagenham-redbridge-vs-salisbury-city/6u75p#5686236"
-        },
-        {
-          "home": "Reyady Abaseya",
-          "away": "Shabab Al Sahel",
-          "date": "2026-11-28",
-          "time_page": "07:15",
-          "start_utc": "2026-11-28T12:15Z",
-          "competition": "Lebanese Premier League",
-          "url": "/match/shabab-al-sahel-vs-reyady-abaseya/85xbm8#5842423"
+          "url": "/match/hartlepool-united-vs-southend-united/3gu1s#5682424"
         },
         {
           "home": "Germany U19",
           "away": "Slovenia U19",
           "date": "2026-11-28",
-          "time_page": "10:00",
-          "start_utc": "2026-11-28T15:00Z",
+          "time_page": "13:00",
+          "start_utc": "2026-11-28T18:00Z",
           "competition": "UEFA U19 European Championship - Women",
-          "url": "/match/germany-u19-vs-slovenia-u19/g91w0w#5841358"
+          "url": "/match/germany-u19-vs-slovenia-u19/g91w0w#5841822"
         },
         {
-          "home": "Jwayya",
-          "away": "Safa",
+          "home": "Palermo",
+          "away": "Benevento",
           "date": "2026-11-28",
-          "time_page": "10:00",
-          "start_utc": "2026-11-28T15:00Z",
+          "time_page": "13:30",
+          "start_utc": "2026-11-28T18:30Z",
+          "competition": "Serie B",
+          "url": "/match/palermo-vs-benevento/6jncu#5742603"
+        },
+        {
+          "home": "Broki",
+          "away": "Notch",
+          "date": "2026-11-28",
+          "time_page": "14:00",
+          "start_utc": "2026-11-28T19:00Z",
+          "competition": "Suriname Major League",
+          "url": "/match/broki-vs-notch/vd44s6#5817681"
+        },
+        {
+          "home": "Internazionale",
+          "away": "Genoa",
+          "date": "2026-11-28",
+          "time_page": "14:45",
+          "start_utc": "2026-11-28T19:45Z",
+          "competition": "Serie A",
+          "url": "/match/genoa-vs-internazionale/1x51k#5654003"
+        },
+        {
+          "home": "Real Madrid",
+          "away": "Deportivo Alavés",
+          "date": "2026-11-28",
+          "time_page": "15:00",
+          "start_utc": "2026-11-28T20:00Z",
+          "competition": "La Liga",
+          "url": "/match/real-madrid-vs-deportivo-alaves/5a8ka#5667421"
+        },
+        {
+          "home": "PVV",
+          "away": "Inter Wanica",
+          "date": "2026-11-28",
+          "time_page": "18:00",
+          "start_utc": "2026-11-28T23:00Z",
+          "competition": "Suriname Major League",
+          "url": "/match/inter-wanica-vs-pvv/vu89kg#5817683"
+        },
+        {
+          "home": "Green Mamba",
+          "away": "Moneni Pirates",
+          "date": "2026-11-29",
+          "time_page": "06:30",
+          "start_utc": "2026-11-29T11:30Z",
+          "competition": "Premier League",
+          "url": "/match/green-mamba-vs-moneni-pirates/9q3pyr#5841446"
+        },
+        {
+          "home": "Pamplemousses",
+          "away": "Chebel Citizens",
+          "date": "2026-11-29",
+          "time_page": "06:30",
+          "start_utc": "2026-11-29T11:30Z",
+          "competition": "Mauritian League",
+          "url": "/match/pamplemousses-vs-chebel-citizens/1jzl3rrpd#5842426"
+        },
+        {
+          "home": "Udinese",
+          "away": "Fiorentina",
+          "date": "2026-11-29",
+          "time_page": "06:30",
+          "start_utc": "2026-11-29T11:30Z",
+          "competition": "Serie A",
+          "url": "/match/fiorentina-vs-udinese/1xis9#5654007"
+        },
+        {
+          "home": "Reyady Abaseya",
+          "away": "Shabab Al Sahel",
+          "date": "2026-11-29",
+          "time_page": "07:15",
+          "start_utc": "2026-11-29T12:15Z",
           "competition": "Lebanese Premier League",
-          "url": "/match/safa-vs-jwayya/9s0fyo#5842424"
+          "url": "/match/shabab-al-sahel-vs-reyady-abaseya/85xbm8#5815744"
+        },
+        {
+          "home": "Sint-Truiden",
+          "away": "Genk",
+          "date": "2026-11-29",
+          "time_page": "07:30",
+          "start_utc": "2026-11-29T12:30Z",
+          "competition": "Pro League",
+          "url": "/match/genk-vs-sint-truiden/43i85#5673568"
+        },
+        {
+          "home": "Red Stars",
+          "away": "Racing Club Brazzavile",
+          "date": "2026-11-29",
+          "time_page": "08:00",
+          "start_utc": "2026-11-29T13:00Z",
+          "competition": "Congo Ligue 1",
+          "url": "/match/racing-club-brazzavile-vs-red-stars/fbj2kp#5833882"
+        },
+        {
+          "home": "Valencia",
+          "away": "Osasuna",
+          "date": "2026-11-29",
+          "time_page": "08:00",
+          "start_utc": "2026-11-29T13:00Z",
+          "competition": "La Liga",
+          "url": "/match/osasuna-vs-valencia/1bmdn#5667423"
+        },
+        {
+          "home": "Ubombo Sugar",
+          "away": "Highlanders",
+          "date": "2026-11-29",
+          "time_page": "08:45",
+          "start_utc": "2026-11-29T13:45Z",
+          "competition": "Premier League",
+          "url": "/match/highlanders-vs-ubombo-sugar/bv8vcw#5841448"
+        },
+        {
+          "home": "Al Mabarrah",
+          "away": "Al Akhaa Al Ahli",
+          "date": "2026-11-28",
+          "time_page": "07:15",
+          "start_utc": "2026-11-28T12:15Z",
+          "competition": "Lebanese Premier League",
+          "url": "/match/al-akhaa-al-ahli-vs-al-mabarrah/osj4l#5843061"
+        },
+        {
+          "home": "Torino",
+          "away": "Lazio",
+          "date": "2026-11-28",
+          "time_page": "10:57",
+          "start_utc": "2026-11-28T15:57Z",
+          "competition": "Serie A",
+          "url": "/match/lazio-vs-torino/36j3q#5843071"
         },
         {
           "home": "Transvaal",
@@ -226,6 +217,24 @@
           "url": "/match/transvaal-vs-inter-moengotapoe/55mgki#5842425"
         },
         {
+          "home": "Al Nejmeh",
+          "away": "Al Hikma",
+          "date": "2026-11-29",
+          "time_page": "07:15",
+          "start_utc": "2026-11-29T12:15Z",
+          "competition": "Lebanese Premier League",
+          "url": "/match/al-nejmeh-vs-al-hikma/4fuwoz#5843072"
+        },
+        {
+          "home": "Como",
+          "away": "Juventus",
+          "date": "2026-11-29",
+          "time_page": "13:27",
+          "start_utc": "2026-11-29T18:27Z",
+          "competition": "Serie A",
+          "url": "/match/juventus-vs-como/6ijlp#5843073"
+        },
+        {
           "home": "Afrique Football Élite",
           "away": "Réal Bamako",
           "date": "2026-11-29",
@@ -233,6 +242,15 @@
           "start_utc": "2026-11-29T18:30Z",
           "competition": "Première Division",
           "url": "/match/real-bamako-vs-afrique-football-elite/5ky2ea#5842428"
+        },
+        {
+          "home": "Germany U19",
+          "away": "Norway U19",
+          "date": "2026-12-01",
+          "time_page": "13:00",
+          "start_utc": "2026-12-01T18:00Z",
+          "competition": "UEFA U19 European Championship - Women",
+          "url": "/match/germany-u19-vs-norway-u19/g2pii4#5843074"
         },
         {
           "home": "Al Mabarrah",
@@ -247,10 +265,10 @@
           "home": "Netherlands U19",
           "away": "Germany U19",
           "date": "2026-12-04",
-          "time_page": "08:00",
-          "start_utc": "2026-12-04T13:00Z",
+          "time_page": "11:00",
+          "start_utc": "2026-12-04T16:00Z",
           "competition": "UEFA U19 European Championship - Women",
-          "url": "/match/germany-u19-vs-netherlands-u19/g0vewp#5841360"
+          "url": "/match/germany-u19-vs-netherlands-u19/g0vewp#5843075"
         },
         {
           "home": "Safa",
@@ -283,17 +301,8 @@
     },
     "Sky Sport Uno": {
       "url": "https://www.livesoccertv.com/channels/sky-sport-uno/",
-      "fetched": "2026-11-28T01:57Z",
+      "fetched": "2026-11-28T17:48Z",
       "matches": [
-        {
-          "home": "Manchester United",
-          "away": "Brentford",
-          "date": "2026-11-28",
-          "time_page": "10:00",
-          "start_utc": "2026-11-28T15:00Z",
-          "competition": "Premier League",
-          "url": "/match/manchester-united-vs-brentford/26lgc#5661147"
-        },
         {
           "home": "Internazionale",
           "away": "Genoa",
@@ -334,17 +343,8 @@
     },
     "Sky Sport Calcio": {
       "url": "https://www.livesoccertv.com/channels/sky-sport-serie-a/",
-      "fetched": "2026-11-28T01:57Z",
+      "fetched": "2026-11-28T17:49Z",
       "matches": [
-        {
-          "home": "Pescara",
-          "away": "Pianese",
-          "date": "2026-11-28",
-          "time_page": "08:30",
-          "start_utc": "2026-11-28T13:30Z",
-          "competition": "Serie C",
-          "url": "/match/pescara-vs-pianese/bg8ih#5720810"
-        },
         {
           "home": "Salernitana",
           "away": "Monopoli",
@@ -448,8 +448,143 @@
     },
     "Sky Sport Max": {
       "url": "https://www.livesoccertv.com/channels/sky-sport-collection/",
-      "fetched": "2026-11-28T01:57Z",
+      "fetched": "2026-11-28T17:49Z",
       "matches": [
+        {
+          "home": "Ajax",
+          "away": "Thun",
+          "date": "2026-11-26",
+          "time_page": "12:45",
+          "start_utc": "2026-11-26T17:45Z",
+          "competition": "UEFA Conference League",
+          "url": "/match/ajax-vs-thun/3c2c8#5774916"
+        },
+        {
+          "home": "Brann",
+          "away": "AGF",
+          "date": "2026-11-26",
+          "time_page": "12:45",
+          "start_utc": "2026-11-26T17:45Z",
+          "competition": "UEFA Conference League",
+          "url": "/match/agf-vs-brann/41rsw#5774917"
+        },
+        {
+          "home": "Brighton & Hove Albion",
+          "away": "CSU Craiova",
+          "date": "2026-11-26",
+          "time_page": "12:45",
+          "start_utc": "2026-11-26T17:45Z",
+          "competition": "UEFA Conference League",
+          "url": "/match/brighton-hove-albion-vs-csu-craiova/t845e#5774918"
+        },
+        {
+          "home": "Egnatia Rrogozhinë",
+          "away": "Lincoln Red Imps",
+          "date": "2026-11-26",
+          "time_page": "12:45",
+          "start_utc": "2026-11-26T17:45Z",
+          "competition": "UEFA Conference League",
+          "url": "/match/lincoln-red-imps-vs-egnatia-rrogozhine/4db9ip#5774919"
+        },
+        {
+          "home": "Hearts",
+          "away": "Monaco",
+          "date": "2026-11-26",
+          "time_page": "12:45",
+          "start_utc": "2026-11-26T17:45Z",
+          "competition": "UEFA Conference League",
+          "url": "/match/monaco-vs-hearts/1f488#5774920"
+        },
+        {
+          "home": "Iberia 1999",
+          "away": "Getafe",
+          "date": "2026-11-26",
+          "time_page": "12:45",
+          "start_utc": "2026-11-26T17:45Z",
+          "competition": "UEFA Conference League",
+          "url": "/match/getafe-vs-iberia-1999/zezhe#5774921"
+        },
+        {
+          "home": "Jablonec",
+          "away": "Lugano",
+          "date": "2026-11-26",
+          "time_page": "12:45",
+          "start_utc": "2026-11-26T17:45Z",
+          "competition": "UEFA Conference League",
+          "url": "/match/jablonec-vs-lugano/40l6g#5774922"
+        },
+        {
+          "home": "Kauno Žalgiris",
+          "away": "Riga",
+          "date": "2026-11-26",
+          "time_page": "12:45",
+          "start_utc": "2026-11-26T17:45Z",
+          "competition": "UEFA Conference League",
+          "url": "/match/riga-vs-kauno-zalgiris/2i6heo#5774923"
+        },
+        {
+          "home": "Olympique Marseille",
+          "away": "Levski Sofia",
+          "date": "2026-11-26",
+          "time_page": "12:45",
+          "start_utc": "2026-11-26T17:45Z",
+          "competition": "UEFA Europa League",
+          "url": "/match/olympique-marseille-vs-levski-sofia/276c0#5775567"
+        },
+        {
+          "home": "Paphos",
+          "away": "Midtjylland",
+          "date": "2026-11-26",
+          "time_page": "12:45",
+          "start_utc": "2026-11-26T17:45Z",
+          "competition": "UEFA Conference League",
+          "url": "/match/midtjylland-vs-paphos/2tsro#5774924"
+        },
+        {
+          "home": "Salzburg",
+          "away": "Ararat-Armenia",
+          "date": "2026-11-26",
+          "time_page": "12:45",
+          "start_utc": "2026-11-26T17:45Z",
+          "competition": "UEFA Europa League",
+          "url": "/match/salzburg-vs-ararat-armenia/1gi3ic#5775571"
+        },
+        {
+          "home": "Union Saint-Gilloise",
+          "away": "Lech Poznań",
+          "date": "2026-11-26",
+          "time_page": "12:45",
+          "start_utc": "2026-11-26T17:45Z",
+          "competition": "UEFA Europa League",
+          "url": "/match/lech-poznan-vs-union-saint-gilloise/s8quq#5775570"
+        },
+        {
+          "home": "Viktoria Plzeň",
+          "away": "Benfica",
+          "date": "2026-11-26",
+          "time_page": "12:45",
+          "start_utc": "2026-11-26T17:45Z",
+          "competition": "UEFA Europa League",
+          "url": "/match/benfica-vs-viktoria-plzen/1ssyd#5775569"
+        },
+        {
+          "home": "Borac Banja Luka",
+          "away": "Atalanta",
+          "date": "2026-11-26",
+          "time_page": "15:00",
+          "start_utc": "2026-11-26T20:00Z",
+          "competition": "UEFA Conference League",
+          "url": "/match/atalanta-vs-borac-banja-luka/61f5o#5774925"
+        },
+        {
+          "home": "Nottingham Forest",
+          "away": "Chelsea",
+          "date": "2026-11-27",
+          "time_page": "15:00",
+          "start_utc": "2026-11-27T20:00Z",
+          "competition": "Premier League",
+          "url": "/match/chelsea-vs-nottingham-forest/1e1q1#5661148"
+        },
         {
           "home": "Hertha BSC",
           "away": "Karlsruher SC",
@@ -463,7 +598,7 @@
     },
     "Sky Sport Arena": {
       "url": "https://www.livesoccertv.com/channels/sky-sport-arena-italy/",
-      "fetched": "2026-11-28T01:58Z",
+      "fetched": "2026-11-28T17:49Z",
       "matches": [
         {
           "home": "Everton",
@@ -514,17 +649,8 @@
     },
     "Sky Sport 251": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-1/",
-      "fetched": "2026-11-28T01:58Z",
+      "fetched": "2026-11-28T17:49Z",
       "matches": [
-        {
-          "home": "Pescara",
-          "away": "Pianese",
-          "date": "2026-11-28",
-          "time_page": "08:30",
-          "start_utc": "2026-11-28T13:30Z",
-          "competition": "Serie C",
-          "url": "/match/pescara-vs-pianese/bg8ih#5720810"
-        },
         {
           "home": "Salernitana",
           "away": "Monopoli",
@@ -610,17 +736,8 @@
     },
     "Sky Sport 252": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-2/",
-      "fetched": "2026-11-28T01:58Z",
+      "fetched": "2026-11-28T17:50Z",
       "matches": [
-        {
-          "home": "Nuova Monterosi",
-          "away": "Campobasso",
-          "date": "2026-11-28",
-          "time_page": "08:30",
-          "start_utc": "2026-11-28T13:30Z",
-          "competition": "Serie C",
-          "url": "/match/campobasso-vs-nuova-monterosi/1nq228#5720807"
-        },
         {
           "home": "Ospitaletto",
           "away": "Union Brescia",
@@ -670,17 +787,8 @@
     },
     "Sky Sport 253": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-3/",
-      "fetched": "2026-11-28T01:59Z",
+      "fetched": "2026-11-28T17:50Z",
       "matches": [
-        {
-          "home": "Gubbio",
-          "away": "Vado",
-          "date": "2026-11-28",
-          "time_page": "08:30",
-          "start_utc": "2026-11-28T13:30Z",
-          "competition": "Serie C",
-          "url": "/match/gubbio-vs-vado/qwgcn#5720806"
-        },
         {
           "home": "Sorrento",
           "away": "Cosenza",
@@ -721,17 +829,8 @@
     },
     "Zona DAZN": {
       "url": "https://www.livesoccertv.com/channels/dazn-1-italy/",
-      "fetched": "2026-11-28T01:56Z",
+      "fetched": "2026-11-28T17:48Z",
       "matches": [
-        {
-          "home": "Frosinone",
-          "away": "Parma",
-          "date": "2026-11-28",
-          "time_page": "09:00",
-          "start_utc": "2026-11-28T14:00Z",
-          "competition": "Serie A",
-          "url": "/match/parma-vs-frosinone/3690l#5654002"
-        },
         {
           "home": "Torino",
           "away": "Lazio",
@@ -871,17 +970,8 @@
     },
     "Sky Sport 254": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-4/",
-      "fetched": "2026-11-28T01:59Z",
+      "fetched": "2026-11-28T17:50Z",
       "matches": [
-        {
-          "home": "Athletic Carpi",
-          "away": "Lecco",
-          "date": "2026-11-28",
-          "time_page": "08:30",
-          "start_utc": "2026-11-28T13:30Z",
-          "competition": "Serie C",
-          "url": "/match/lecco-vs-athletic-carpi/3zpe8y#5720427"
-        },
         {
           "home": "Pergolettese",
           "away": "Giana Erminio",
@@ -913,17 +1003,8 @@
     },
     "Sky Sport 255": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-5/",
-      "fetched": "2026-11-28T01:59Z",
+      "fetched": "2026-11-28T17:50Z",
       "matches": [
-        {
-          "home": "Giugliano",
-          "away": "Team Altamura",
-          "date": "2026-11-28",
-          "time_page": "08:30",
-          "start_utc": "2026-11-28T13:30Z",
-          "competition": "Serie C",
-          "url": "/match/team-altamura-vs-giugliano/4old84#5721191"
-        },
         {
           "home": "Lumezzane",
           "away": "Desenzano Calvina",
@@ -964,16 +1045,16 @@
     },
     "Sky Sport 256": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-6/",
-      "fetched": "2026-11-28T01:59Z",
+      "fetched": "2026-11-28T17:50Z",
       "matches": [
         {
-          "home": "Novara",
-          "away": "Alcione",
+          "home": "Lumezzane",
+          "away": "Desenzano Calvina",
           "date": "2026-11-28",
-          "time_page": "08:30",
-          "start_utc": "2026-11-28T13:30Z",
+          "time_page": "11:30",
+          "start_utc": "2026-11-28T16:30Z",
           "competition": "Serie C",
-          "url": "/match/novara-vs-alcione/3jpyi0#5720431"
+          "url": "/match/lumezzane-vs-desenzano-calvina/28xugg#5720430"
         },
         {
           "home": "Juventus II",
@@ -1006,7 +1087,7 @@
     },
     "Sky Sport 257": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-7/",
-      "fetched": "2026-11-28T02:00Z",
+      "fetched": "2026-11-28T17:51Z",
       "matches": [
         {
           "home": "Spezia",
@@ -1048,7 +1129,7 @@
     },
     "Sky Sport 258": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-8/",
-      "fetched": "2026-11-28T02:00Z",
+      "fetched": "2026-11-28T17:51Z",
       "matches": [
         {
           "home": "Barletta",
@@ -1081,7 +1162,7 @@
     },
     "Sky Sport 259": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-9/",
-      "fetched": "2026-11-28T02:00Z",
+      "fetched": "2026-11-28T17:51Z",
       "matches": [
         {
           "home": "Union ArzignanoChiampo",
@@ -1105,12 +1186,12 @@
     },
     "Sky Sport 260": {
       "url": "https://www.livesoccertv.com/channels/sky-calcio-10/",
-      "fetched": "2026-11-28T02:00Z",
+      "fetched": "2026-11-28T17:51Z",
       "matches": []
     },
     "RSI LA2": {
       "url": "https://www.livesoccertv.com/channels/rsi-la-2/",
-      "fetched": "2026-11-28T02:01Z",
+      "fetched": "2026-11-28T17:52Z",
       "matches": [
         {
           "home": "Servette",
@@ -1143,7 +1224,7 @@
     },
     "Prime Video": {
       "url": "https://www.livesoccertv.com/channels/amazon-prime-video-italy/",
-      "fetched": "2026-11-28T02:01Z",
+      "fetched": "2026-11-28T17:52Z",
       "matches": [
         {
           "home": "Borussia Dortmund",
@@ -1157,6 +1238,6 @@
       ]
     }
   },
-  "updated": "2026-11-28T02:01Z",
+  "updated": "2026-11-28T17:52Z",
   "page_timezone": "America/New_York"
 }
